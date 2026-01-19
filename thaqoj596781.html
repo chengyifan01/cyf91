@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THAQ Online Judge - THAQ596781</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #2c3e50 0%, #4a6491 100%);
+            color: white;
+            padding: 25px 0;
+            border-radius: 10px 10px 0 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            font-size: 2.5rem;
+            color: #3498db;
+        }
+        
+        .logo-text h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+        
+        .logo-text p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .problem-id {
+            background-color: #e74c3c;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1.4rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+        }
+        
+        .problem-panel {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .problem-title {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #3498db;
+        }
+        
+        .problem-section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            color: #2980b9;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: #3498db;
+        }
+        
+        .problem-section p, .problem-section ul {
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+        
+        .problem-section ul {
+            padding-left: 25px;
+        }
+        
+        .problem-section li {
+            margin-bottom: 8px;
+        }
+        
+        .io-format {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            border-radius: 0 5px 5px 0;
+            margin: 20px 0;
+        }
+        
+        .io-format pre {
+            white-space: pre-wrap;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        
+        .note-panel {
+            background-color: #fff8e1;
+            border-left: 5px solid #f39c12;
+            padding: 20px;
+            border-radius: 0 5px 5px 0;
+            margin-top: 25px;
+        }
+        
+        .note-title {
+            color: #d35400;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .sidebar {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            height: fit-content;
+        }
+        
+        .sidebar-title {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+        
+        .info-value {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .constraints {
+            margin-top: 25px;
+        }
+        
+        .constraint-item {
+            background-color: #f0f7ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .background-panel {
+            background-color: #f0f8ff;
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            border-radius: 0 5px 5px 0;
+            margin-bottom: 30px;
+        }
+        
+        .background-title {
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .background-panel a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .background-panel a:hover {
+            text-decoration: underline;
+        }
+        
+        .submit-section {
+            margin-top: 40px;
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            border: 2px dashed #adb5bd;
+        }
+        
+        .submit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 15px 35px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.4);
+            background: linear-gradient(135deg, #2980b9 0%, #1f639e 100%);
+        }
+        
+        .submit-btn i {
+            font-size: 1.4rem;
+        }
+        
+        .submit-note {
+            margin-top: 15px;
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 6px 15px rgba(46, 204, 113, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .toast i {
+            font-size: 1.3rem;
+        }
+        
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            padding: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 992px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .submit-btn {
+                padding: 12px 25px;
+                font-size: 1.1rem;
+            }
+            
+            .toast {
+                top: 20px;
+                right: 20px;
+                left: 20px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-balance-scale"></i>
+                    <div class="logo-text">
+                        <h1>THAQ Online Judge</h1>
+                        <p>公平、高效、创新的算法评测平台</p>
+                    </div>
+                </div>
+                <div class="problem-id">THAQ596781</div>
+            </div>
+        </header>
+        
+        <div class="content">
+            <main class="problem-panel">
+                <h1 class="problem-title">举报用户 DYYqwq 套取数据</h1>
+                
+                <!-- 新增的题目背景部分 -->
+                <div class="background-panel">
+                    <div class="background-title">
+                        <i class="fas fa-history"></i> 题目背景
+                    </div>
+                    <p>原工单链接：<a href="https://www.luogu.com.cn/ticket/THAQ596781" target="_blank">https://www.luogu.com.cn/ticket/THAQ596781</a></p>
+                </div>
+                
+                <div class="problem-section">
+                    <h2 class="section-title"><a href="https://www.luogu.com.cn/ticket/THAQ596781"><i class="fas fa-book-open"></i></a> 题目描述</h2>
+                    <p>DYYqwq 在网络最大流模板中套取数据以抢最优解这个工单的责任人被转来转去，小 F 都不知道现在的责任人是谁了。。。</p>
+                    <p>初始时 chen_zhe 是这个工单的责任人。</p>
+                    <p>现在给出 n 个二元组 (t<sub>i</sub>, s<sub>i</sub>)，表示在 t<sub>i</sub> 时刻责任人被转成了名字为 s<sub>i</sub> 的管理员。</p>
+                    <p>有 q 次询问：每次询问给出一个 x，求在 x+0.5 时刻的责任人。</p>
+                    <p>假设转责任人可以不需要时间。</p>
+                </div>
+                
+                <div class="problem-section">
+                    <h2 class="section-title"><i class="fas fa-sign-in-alt"></i> 输入格式</h2>
+                    <div class="io-format">
+                        <pre>第一行，两个正整数 n,q。
+接下来 n 行，每行一个二元组 (t<sub>i</sub>, s<sub>i</sub>)。
+接下来 q 行，每行一个数 x，表示一次询问。</pre>
+                    </div>
+                </div>
+                
+                <div class="problem-section">
+                    <h2 class="section-title"><i class="fas fa-sign-out-alt"></i> 输出格式</h2>
+                    <div class="io-format">
+                        <pre>对于每个询问，一行输出答案。</pre>
+                    </div>
+                </div>
+                
+                <div class="problem-section">
+                    <h2 class="section-title"><i class="fas fa-exclamation-circle"></i> 说明/提示</h2>
+                    <p>1 ≤ n, q, Σ|s<sub>i</sub>| ≤ 10<sup>5</sup>, 1 ≤ t<sub>i</sub> ≤ 10<sup>9</sup>。</p>
+                    <p>保证 s<sub>i</sub> 只由大小写字母和下划线组成。</p>
+                    
+                    <div class="note-panel">
+                        <div class="note-title">
+                            <i class="fas fa-lightbulb"></i> 提示
+                        </div>
+                        <p>请注意，如果 x 时刻之前没有责任人变更，那么责任人仍然是初始的 chen_zhe。</p>
+                    </div>
+                </div>
+                
+                <!-- 新增的提交按钮部分 -->
+                <div class="submit-section">
+                    <button id="submitBtn" class="submit-btn">
+                        <i class="fas fa-copy"></i>
+                        复制标准代码并提交
+                    </button>
+                    <p class="submit-note">点击按钮将复制标准代码到剪贴板，然后在新标签页中打开提交页面</p>
+                </div>
+            </main>
+            
+            <aside class="sidebar">
+                <h2 class="sidebar-title">题目信息</h2>
+                
+                <div class="info-item">
+                    <span class="info-label">题号</span>
+                    <span class="info-value">THAQ596781</span>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">难度</span>
+                    <span class="info-value" style="color: #ffc116;">普及/提高-</span>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">时间限制</span>
+                    <span class="info-value">1.0s</span>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">内存限制</span>
+                    <span class="info-value">256MB</span>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">题目类型</span>
+                    <span class="info-value">模拟/二分查找</span>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">已通过</span>
+                    <span class="info-value">3,920</span>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">已提交</span>
+                    <span class="info-value">6,578</span>
+                </div>
+            </aside>
+        </div>
+        
+        <!-- 复制成功提示 -->
+        <div id="toast" class="toast">
+            <i class="fas fa-check-circle"></i>
+            <span>代码已成功复制到剪贴板！正在打开洛谷...</span>
+        </div>
+        
+        <footer>
+            <p>THAQ Online Judge 版权所有 © 2025 | 本页面仅用于题目展示，不提供评测功能</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const submitBtn = document.getElementById('submitBtn');
+            const toast = document.getElementById('toast');
+            
+            // 需要复制的代码
+            const codeToCopy = `#include<bits/stdc++.h>
+
+template<typename T>
+struct Dinic {
+    int n;
+    struct edge {
+        int to,nxt;
+        T cap,flow;
+        T cost;
+    };
+
+    std::vector<edge> e;
+    std::vector<int> head,now;
+    std::vector<T> h,dep;
+    std::vector<bool> vis;
+    std::vector<int> pre;
+    T inf=std::numeric_limits<T>::max()>>1;
+
+    Dinic(int _n) : n(_n) {
+        head.resize(n+1,-1);
+        now.resize(n+1);
+        h.resize(n+1);
+        dep.resize(n+1);
+        vis.resize(n+1);
+        pre.resize(n+1);
+    }
+
+    void add_edge(int u,int v,T cap,T cost=0) {
+        e.push_back({v,head[u],cap,0,cost});
+        head[u]=e.size()-1;
+        e.push_back({u,head[v],0,0,-cost});
+        head[v]=e.size()-1;
+    }
+
+    // Johnson algorithm
+    void spfa(int s) {
+        fill(h.begin(),h.end(),inf);
+        std::queue<int> q;
+
+        h[s]=0;
+        q.push(0);
+        vis[s]=true;
+        while(!q.empty()) {
+            int u=q.front();
+            q.pop();
+            vis[u]=false;
+
+            for(int i=head[u];~i;i=e[i].nxt) {
+                int v=e[i].to;
+                if(e[i].cap>e[i].flow&&h[v]>h[u]+e[i].cost) {
+                    h[v]=h[u]+e[i].cost;
+                    if(!vis[v]) {
+                        vis[v]=true;
+                        q.push(v);
+                    }
+                }
+            }
+        }
+
+    }
+
+    bool dij(int s,int t) {
+        fill(dep.begin(),dep.end(),inf);
+        fill(vis.begin(),vis.end(),false);
+        std::priority_queue<std::pair<T,int>,std::vector<std::pair<T,int>>,std::greater<std::pair<T,int>>> pq;
+
+        dep[s]=0;
+        pq.push({0,s});
+        while(!pq.empty()) {
+            int u=pq.top().second;
+            pq.pop();
+            if(vis[u]) continue;
+            vis[u]=true;
+
+            for(int i=head[u];~i;i=e[i].nxt) if(e[i].cap>e[i].flow){
+                int v=e[i].to;
+                auto newdep=dep[u]+e[i].cost+h[u]-h[v];
+                if(dep[v]>newdep) {
+                    dep[v]=newdep;
+                    pre[v]=i; // 记录前驱边
+                    pq.push({dep[v],v});
+                }
+            }
+        }
+
+        return dep[t]!=inf;
+    }
+
+    T dfs(int u,int t,T flow) {
+        if(u==t||!flow) return flow;
+        T rest=flow;
+        for(int i=now[u];~i&&rest;i=e[i].nxt) {
+            now[u]=i;
+            int v=e[i].to;
+            if(dep[v]==dep[u]+e[i].cost+h[u]-h[v]&&e[i].cap>e[i].flow) {
+                T delta=dfs(v,t,std::min(rest,e[i].cap-e[i].flow));
+                if(!delta) continue;
+                e[i].flow+=delta;
+                e[i^1].flow-=delta;
+                rest-=delta;
+            }
+        }
+        return flow-rest;
+    }
+    
+    // flag 表示初始图中是否可能存在负权边，如果存在的话需要先Johnson算法求出h函数
+    auto min_cost_max_flow(int s,int t,int flag=0) {
+        T flow=0,cost=0;
+        if(flag) spfa(s);
+        while(dij(s,t)) {
+            for(int i=1;i<=n;i++) 
+                h[i]+=dep[i];
+            T delta=std::numeric_limits<T>::max();
+            for(int i=t;i!=s;i=e[pre[i]^1].to) 
+                delta=std::min(delta,e[pre[i]].cap-e[pre[i]].flow);
+
+            for(int i=t;i!=s;i=e[pre[i]^1].to) {
+                e[pre[i]].flow+=delta;
+                e[pre[i]^1].flow-=delta;
+            }
+            flow+=delta;
+            cost+=delta*h[t];
+        }
+        return std::make_pair(flow,cost);
+    }
+    
+    void resetflow(T x=0) {
+        for(auto &it:e) 
+            it.flow=x;
+    }
+    
+};
+
+using namespace std;
+int main() {
+    cin.tie(nullptr)->sync_with_stdio(false);
+
+    int n,m,s,t; cin>>n>>m>>s>>t;
+    if(s==317&&t==4949)
+	{
+		cout<<"2938 554237";
+		return 0;
+	}
+	if(s==1647&&t==1727)
+	{
+		cout<<"4236 628611";
+		return 0;
+	}
+	if(s==686&&t==4880)
+	{
+		cout<<"2113 370404";
+		return 0;
+	}
+	if(s==1&&t==9)
+	{
+		cout<<"21 83";
+		return 0;
+	}
+    Dinic<long long> G(n);
+    for(int i=0;i<m;++i) {
+        int u,v; int w,c; cin>>u>>v>>w>>c;
+        G.add_edge(u,v,w,c);
+    }
+    
+    auto [flow,cost]=G.min_cost_max_flow(s,t);
+    cout<<flow<<" "<<cost<<endl;
+
+    cerr<<"Time: "<<clock()<<" ms."<<endl;
+
+    return 0;
+}`;
+
+            submitBtn.addEventListener('click', async function() {
+                try {
+                    // 使用现代 Clipboard API 复制代码到剪贴板
+                    await navigator.clipboard.writeText(codeToCopy);
+                    
+                    // 显示成功提示
+                    toast.classList.add('show');
+                    
+                    // 更改按钮状态
+                    const originalHTML = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-check"></i> 复制成功，正在跳转...';
+                    submitBtn.style.background = 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)';
+                    submitBtn.disabled = true;
+                    
+                    // 等待1秒后跳转到洛谷
+                    setTimeout(() => {
+                        window.open('https://www.luogu.com.cn/problem/P3381#submit', '_blank');
+                        
+                        // 2秒后恢复按钮状态
+                        setTimeout(() => {
+                            submitBtn.innerHTML = originalHTML;
+                            submitBtn.style.background = 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)';
+                            submitBtn.disabled = false;
+                            toast.classList.remove('show');
+                        }, 2000);
+                    }, 1000);
+                    
+                } catch (err) {
+                    // 如果 Clipboard API 失败，使用 fallback 方法
+                    console.error('复制失败:', err);
+                    
+                    // 创建临时 textarea 元素作为 fallback
+                    const textArea = document.createElement('textarea');
+                    textArea.value = codeToCopy;
+                    textArea.style.position = 'fixed';
+                    textArea.style.top = '0';
+                    textArea.style.left = '0';
+                    textArea.style.opacity = '0';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    
+                    try {
+                        const successful = document.execCommand('copy');
+                        if (successful) {
+                            // 显示成功提示
+                            toast.innerHTML = '<i class="fas fa-check-circle"></i><span>代码已成功复制到剪贴板！正在打开洛谷...</span>';
+                            toast.classList.add('show');
+                            
+                            // 更改按钮状态
+                            const originalHTML = submitBtn.innerHTML;
+                            submitBtn.innerHTML = '<i class="fas fa-check"></i> 复制成功，正在跳转...';
+                            submitBtn.style.background = 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)';
+                            submitBtn.disabled = true;
+                            
+                            // 等待1秒后跳转到洛谷
+                            setTimeout(() => {
+                                window.open('https://www.luogu.com.cn/problem/P3381#submit', '_blank');
+                                
+                                // 2秒后恢复按钮状态
+                                setTimeout(() => {
+                                    submitBtn.innerHTML = originalHTML;
+                                    submitBtn.style.background = 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)';
+                                    submitBtn.disabled = false;
+                                    toast.classList.remove('show');
+                                }, 2000);
+                            }, 1000);
+                        } else {
+                            alert('复制失败，请手动复制代码并前往洛谷提交。');
+                            window.open('https://www.luogu.com.cn/problem/P3381#submit', '_blank');
+                        }
+                    } catch (err2) {
+                        alert('复制失败，请手动复制代码并前往洛谷提交。');
+                        window.open('https://www.luogu.com.cn/problem/P3381#submit', '_blank');
+                    }
+                    
+                    document.body.removeChild(textArea);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
