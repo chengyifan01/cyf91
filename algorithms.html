@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="付费算法起拍价与定义总览">
+<title>付费算法 · 起拍价与定义</title>
+<style>
+:root {
+  --bg:#fff; --surface:#fff; --surface-2:#f7f9fc; --text:#0f172a; --muted:#64748b;
+  --line:#e7edf4; --brand:#2457d6; --shadow:0 10px 30px rgba(15,23,42,.06); --radius:20px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,"SF Pro Display","PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+::selection{background:#dfe8ff}
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line);background:radial-gradient(circle at 10% 0%,rgba(36,87,214,.08),transparent 30%),radial-gradient(circle at 88% 5%,rgba(91,123,234,.08),transparent 28%),#fff}
+.hero-inner{max-width:1240px;margin:auto;padding:72px 28px 46px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid #dbe5ff;border-radius:999px;background:#f8faff;color:var(--brand);font-size:13px;font-weight:700;letter-spacing:.08em}
+.eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--brand)}
+h1{font-size:clamp(38px,6vw,72px);line-height:1.05;letter-spacing:-.045em;margin:22px 0 18px}
+.subtitle{max-width:820px;color:var(--muted);font-size:18px;line-height:1.8;margin:0}
+.hero-meta{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.meta-chip{display:flex;align-items:baseline;gap:7px;padding:10px 14px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:0 3px 16px rgba(15,23,42,.03)}
+.meta-chip strong{font-size:20px} .meta-chip span{font-size:13px;color:var(--muted)}
+.toolbar-wrap{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.88);backdrop-filter:saturate(170%) blur(18px);border-bottom:1px solid var(--line)}
+.toolbar{max-width:1240px;margin:auto;padding:14px 28px;display:grid;grid-template-columns:minmax(240px,1fr) auto auto;gap:10px}
+.search{position:relative;display:flex;align-items:center;background:#f8fafc;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.search svg{margin-left:14px;flex:none;color:#94a3b8}
+.search input{width:100%;border:0;outline:0;background:transparent;padding:13px 14px 13px 10px;font-size:15px;color:var(--text)}
+select,.reset{border:1px solid var(--line);background:#fff;border-radius:14px;padding:0 14px;color:var(--text);font:inherit;min-height:48px}
+.reset{cursor:pointer;font-weight:700} .reset:hover{background:#f8fafc}
+main{max-width:1240px;margin:auto;padding:32px 28px 80px}
+.price-band{margin-bottom:28px}
+.section-label{font-size:13px;font-weight:800;letter-spacing:.1em;color:#94a3b8;text-transform:uppercase;margin-bottom:12px}
+.price-pills{display:flex;gap:10px;flex-wrap:wrap}
+.price-pill{border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px 13px;cursor:pointer;display:flex;gap:8px;align-items:baseline;transition:.2s ease}
+.price-pill b{font-size:15px} .price-pill span{font-size:12px;color:var(--muted)}
+.price-pill:hover,.price-pill.active{border-color:#bdccfa;background:#f7f9ff;transform:translateY(-1px)}
+.results-line{display:flex;align-items:center;justify-content:space-between;margin:22px 0 16px;gap:16px}
+.results-line strong{font-size:18px} .results-line span{font-size:13px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.card{position:relative;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);padding:24px 24px 22px;box-shadow:0 1px 0 rgba(15,23,42,.01);transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:#d9e3ef}
+.card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.index{width:38px;height:38px;border-radius:12px;background:#f5f7fb;display:grid;place-items:center;color:#94a3b8;font-size:12px;font-weight:800;letter-spacing:.06em}
+.price{padding:8px 11px;border-radius:12px;background:#eef3ff;color:var(--brand);font-weight:800;font-size:14px;letter-spacing:.02em}
+.card h2{font-size:22px;line-height:1.35;margin:0 0 12px;letter-spacing:-.02em}
+.desc{font-size:15px;line-height:1.85;color:#475569;margin:0}
+.note{margin-top:16px;padding:12px 14px;border-left:3px solid #9db3f5;border-radius:10px;background:#f8faff;color:#4a5f93;font-size:13px;line-height:1.65}
+.note span{display:inline-block;margin-right:8px;padding:2px 6px;border-radius:6px;background:#e8eeff;color:var(--brand);font-weight:800}
+.empty{display:none;text-align:center;padding:72px 16px;border:1px dashed #d6dee8;border-radius:20px;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:28px;color:#94a3b8;text-align:center;font-size:13px}
+@media(max-width:860px){.hero-inner{padding-top:50px}.toolbar{grid-template-columns:1fr 1fr}.search{grid-column:1/-1}.grid{grid-template-columns:1fr}}
+@media(max-width:520px){.hero-inner,main,.toolbar{padding-left:18px;padding-right:18px}.hero-inner{padding-top:40px}h1{font-size:42px}.subtitle{font-size:16px}.toolbar{grid-template-columns:1fr}.search{grid-column:auto}.card{padding:20px}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">ALGORITHM CATALOG</div>
+    <h1>付费算法<br>起拍价与定义</h1>
+    <p class="subtitle">一页浏览全部算法条目、起拍价与定义。支持关键词检索、价格筛选和排序，适合快速查阅与展示。</p>
+    <div class="hero-meta">
+      <div class="meta-chip"><strong>63</strong><span>算法条目</span></div>
+      <div class="meta-chip"><strong>¥ 10–100</strong><span>起拍价区间</span></div>
+      <div class="meta-chip"><strong>9</strong><span>价格档位</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="toolbar-wrap">
+  <div class="toolbar">
+    <label class="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="m21 21-4.35-4.35m2.35-5.15a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <input id="search" type="search" placeholder="搜索算法名或定义，例如：线段树 / O(log N)">
+    </label>
+    <select id="sort" aria-label="排序">
+      <option value="default">默认顺序</option>
+      <option value="price-asc">价格从低到高</option>
+      <option value="price-desc">价格从高到低</option>
+      <option value="name">名称 A–Z</option>
+    </select>
+    <button class="reset" id="reset">重置</button>
+  </div>
+</div>
+
+<main>
+  <section class="price-band">
+    <div class="section-label">Price Filter · 起拍价筛选</div>
+    <div class="price-pills">
+      <button class="price-pill active" data-price="all"><b>全部</b><span>63 项</span></button>
+      <button class="price-pill" data-price="10"><b>10</b><span>2 项</span></button><button class="price-pill" data-price="20"><b>20</b><span>6 项</span></button><button class="price-pill" data-price="30"><b>30</b><span>15 项</span></button><button class="price-pill" data-price="40"><b>40</b><span>9 项</span></button><button class="price-pill" data-price="50"><b>50</b><span>13 项</span></button><button class="price-pill" data-price="60"><b>60</b><span>10 项</span></button><button class="price-pill" data-price="70"><b>70</b><span>2 项</span></button><button class="price-pill" data-price="80"><b>80</b><span>5 项</span></button><button class="price-pill" data-price="100"><b>100</b><span>1 项</span></button>
+    </div>
+  </section>
+
+  <div class="results-line">
+    <strong>算法目录</strong>
+    <span id="count">显示 63 / 63 项</span>
+  </div>
+
+  <section class="grid" id="grid">
+    
+<article class="card" data-name="二分答案" data-price="50">
+  <div class="card-top">
+    <div class="index">01</div>
+    <div class="price">¥ 50</div>
+  </div>
+  <h2>二分答案</h2>
+  <p class="desc">在答案具有单调性的前提下，利用二分的思想枚举答案，将求解问题转化为验证结果。首先估计答案的上下界，然后不断取区间中点进行验证，通过验证结果不断更新答案区间，最终得到答案。</p>
+  <div class="note"><span>注</span>本条目特指“二分答案”这一解题策略，不包括二分查找（在有序数组中查找特定元素）。</div>
+</article>
+<article class="card" data-name="倍增（含普通倍增 lca）" data-price="50">
+  <div class="card-top">
+    <div class="index">02</div>
+    <div class="price">¥ 50</div>
+  </div>
+  <h2>倍增（含普通倍增 LCA）</h2>
+  <p class="desc">预处理以 2 的整次幂为步长的状态，再把任意目标步数按二进制拆成若干 2 的幂之和，逐段跳跃合并出答案。该思想是 ST 表与最近公共祖先（LCA）的基础，也用于求树上第 k 级祖先一类可倍增合并的问题。</p>
+  
+</article>
+<article class="card" data-name="折半搜索" data-price="40">
+  <div class="card-top">
+    <div class="index">03</div>
+    <div class="price">¥ 40</div>
+  </div>
+  <h2>折半搜索</h2>
+  <p class="desc">从状态图上的起点和终点同时开始进行搜索，或将搜索分成多半分别搜索，最后合并。通过将搜索空间一分为二（或多份）分别枚举，再合并两半（或多份）的结果来降低时间复杂度。</p>
+  <div class="note"><span>注</span>注意：此处的“折半搜索”指 meet-in-the-middle，与二分查找（binary search / half-interval search）是不同的概念。</div>
+</article>
+<article class="card" data-name="哈希" data-price="40">
+  <div class="card-top">
+    <div class="index">04</div>
+    <div class="price">¥ 40</div>
+  </div>
+  <h2>哈希</h2>
+  <p class="desc">将输入（如字符串、集合等）映射到一个值域较小、可以方便比较的范围的映射函数。在算法竞赛中，通常采用多项式哈希的方法。哈希函数的核心性质是：哈希值不同则原输入一定不同；哈希值相同则原输入大概率相同（存在哈希碰撞的可能）。</p>
+  
+</article>
+<article class="card" data-name="trie 树" data-price="40">
+  <div class="card-top">
+    <div class="index">05</div>
+    <div class="price">¥ 40</div>
+  </div>
+  <h2>Trie 树</h2>
+  <p class="desc">通过节点代表从根节点到该节点的路径上的信息的树形数据结构。每个节点代表一个字符串（从根到该节点的路径），从根节点出发沿字符边可到达所有前缀。</p>
+  
+</article>
+<article class="card" data-name="kmp" data-price="30">
+  <div class="card-top">
+    <div class="index">06</div>
+    <div class="price">¥ 30</div>
+  </div>
+  <h2>KMP</h2>
+  <p class="desc">KMP算法是所有字符串匹配算法的集合中，唯一满足以下正交约束的算法：（1）预处理生成最长边界闭包；（2）扫描阶段文本指针绝对单增；（3）失配转移函数等于边界函数的Kleene闭包；（4）匹配后保留边界重叠。</p>
+  
+</article>
+<article class="card" data-name="ac自动机" data-price="50">
+  <div class="card-top">
+    <div class="index">07</div>
+    <div class="price">¥ 50</div>
+  </div>
+  <h2>AC自动机</h2>
+  <p class="desc">以 Trie 树中的失配链代替 KMP 中的序列做多模式字符串匹配的算法/数据结构。通过构造一个有限状态机（在 Trie 树中添加失配指针），允许在匹配失败时回退到某前缀的其他分支，免于重复匹配前缀。</p>
+  <div class="note"><span>注</span>此类不算 KMP / Trie。</div>
+</article>
+<article class="card" data-name="sam" data-price="60">
+  <div class="card-top">
+    <div class="index">08</div>
+    <div class="price">¥ 60</div>
+  </div>
+  <h2>SAM</h2>
+  <p class="desc">后缀自动机（SAM） 是字符串上的唯一最小 DFA，其状态集合由 endpos 等价关系严格商掉所有子串得到。它必须携带双重结构——转移函数和后缀链接函数。其在线构造算法强制要求执行“克隆”操作以维持状态数 |Q| ≤ 2|S| − 1 的紧界。</p>
+  
+</article>
+<article class="card" data-name="高斯消元" data-price="40">
+  <div class="card-top">
+    <div class="index">09</div>
+    <div class="price">¥ 40</div>
+  </div>
+  <h2>高斯消元</h2>
+  <p class="desc">它在数域 F 上对增广矩阵施加有限序列的初等行变换（行交换、行缩放、行加法），并在每列执行带部分主元（行交换）的前向消去，将矩阵唯一（在归一化后）地转化为行阶梯形（REF），随后必须通过从底向上的严格回代过程输出解向量。</p>
+  
+</article>
+<article class="card" data-name="并查集" data-price="50">
+  <div class="card-top">
+    <div class="index">10</div>
+    <div class="price">¥ 50</div>
+  </div>
+  <h2>并查集</h2>
+  <p class="desc">通过树形结构维护元素间是否在同一集合的数据结构。支持三种基本操作：初始化（每个元素自成集合）、查找（Find，确定元素所属集合的根节点）、合并（Union，将两个不同集合联结）。常配合路径压缩与启发式合并两种优化策略。</p>
+  
+</article>
+<article class="card" data-name="分块及其他块状数据结构" data-price="60">
+  <div class="card-top">
+    <div class="index">11</div>
+    <div class="price">¥ 60</div>
+  </div>
+  <h2>分块及其他块状数据结构</h2>
+  <p class="desc">本条目不包括分块的思想及应用此思想的其他算法，特指：（1）块状数组：将序列分成若干块，在每块上分别维护信息；（2）块状链表：每个节点下挂着一个线性链表，维护一段区间。</p>
+  
+</article>
+<article class="card" data-name="莫队" data-price="60">
+  <div class="card-top">
+    <div class="index">12</div>
+    <div class="price">¥ 60</div>
+  </div>
+  <h2>莫队</h2>
+  <p class="desc">将询问按照左端点所在块为第一关键字、右端点为第二关键字排序，通过维护两个指针在序列上移动来回答所有区间询问。通过合理地分块和排序，使指针移动的总次数达到 O((n+q)√n) 的级别。</p>
+  
+</article>
+<article class="card" data-name="单调栈" data-price="30">
+  <div class="card-top">
+    <div class="index">13</div>
+    <div class="price">¥ 30</div>
+  </div>
+  <h2>单调栈</h2>
+  <p class="desc">维护一个栈内元素单调递增或单调递减的栈结构。每个元素入栈时弹出所有破坏单调性的元素，从而在 O(n) 时间内求解每个元素左侧/右侧第一个比它大/小的元素等问题。</p>
+  
+</article>
+<article class="card" data-name="单调队列" data-price="30">
+  <div class="card-top">
+    <div class="index">14</div>
+    <div class="price">¥ 30</div>
+  </div>
+  <h2>单调队列</h2>
+  <p class="desc">维护一个队首到队尾单调递增或单调递减的双端队列。常用于滑动窗口最值问题，每个元素入队时从队尾弹出破坏单调性的元素，从队首获取当前窗口的最值，时间复杂度 O(n)。</p>
+  
+</article>
+<article class="card" data-name="st 表" data-price="30">
+  <div class="card-top">
+    <div class="index">15</div>
+    <div class="price">¥ 30</div>
+  </div>
+  <h2>ST 表</h2>
+  <p class="desc">基于倍增思想的静态区间最值查询数据结构。预处理 st[i][j] 表示从 i 开始长度为 2^j 的区间的最值，查询时将区间 [l, r] 拆分为两个长度均为 2^k 的区间（k = ⌊log₂(r-l+1)⌋）取最值，单次查询 O(1)。仅支持静态查询，不支持修改。</p>
+  
+</article>
+<article class="card" data-name="树状数组" data-price="60">
+  <div class="card-top">
+    <div class="index">16</div>
+    <div class="price">¥ 60</div>
+  </div>
+  <h2>树状数组</h2>
+  <p class="desc">一种专为区间统计设计的高效数据结构，修改和查询的时间复杂度均为 O(log N)，代码量小、常数小。通过二进制拆分区间维护前缀信息，支持单点修改和区间查询（查询需满足可减性，如区间和）。核心操作基于 lowbit 实现。</p>
+  
+</article>
+<article class="card" data-name="线段树" data-price="100">
+  <div class="card-top">
+    <div class="index">17</div>
+    <div class="price">¥ 100</div>
+  </div>
+  <h2>线段树</h2>
+  <p class="desc">一种基于分治思想的二叉树数据结构，每个节点代表一个区间，维护该区间的某种信息（如和、最大值、最小值等）。支持区间修改和区间查询，时间复杂度均为 O(log N)。通过懒标记（Lazy Tag）可实现区间加、区间赋值等操作。</p>
+  
+</article>
+<article class="card" data-name="平衡树" data-price="80">
+  <div class="card-top">
+    <div class="index">18</div>
+    <div class="price">¥ 80</div>
+  </div>
+  <h2>平衡树</h2>
+  <p class="desc">一种自平衡的二叉搜索树，通过旋转等操作保持树的高度为 O(log N)，从而保证插入、删除、查找、前驱/后继、排名查询等操作的时间复杂度均为 O(log N)。常见实现有 Treap、Splay、FHQ-Treap、红黑树等。</p>
+  
+</article>
+<article class="card" data-name="笛卡尔树" data-price="40">
+  <div class="card-top">
+    <div class="index">19</div>
+    <div class="price">¥ 40</div>
+  </div>
+  <h2>笛卡尔树</h2>
+  <p class="desc">一种特殊的二叉树，其中序遍历对应原序列的顺序，且满足堆性质（大根堆或小根堆）。每个节点的键值为原序列中的值，优先级为下标（或反之）。可通过单调栈在 O(n) 时间内构建，常用于 RMQ 问题的转化。</p>
+  
+</article>
+<article class="card" data-name="树链剖分" data-price="80">
+  <div class="card-top">
+    <div class="index">20</div>
+    <div class="price">¥ 80</div>
+  </div>
+  <h2>树链剖分</h2>
+  <p class="desc">将树分解为若干条不相交的链（重链/轻链），使得树上任意两点间的路径可以被分解为 O(log N) 条链上的区间。结合线段树等数据结构，可支持树上路径修改、路径查询、子树修改、子树查询等操作，单次操作时间复杂度 O(log² N)。</p>
+  
+</article>
+<article class="card" data-name="虚树" data-price="50">
+  <div class="card-top">
+    <div class="index">21</div>
+    <div class="price">¥ 50</div>
+  </div>
+  <h2>虚树</h2>
+  <p class="desc">在原树中只保留若干关键节点及其两两之间的 LCA，并重新构建一棵压缩后的树。虚树保留了关键节点之间的祖先关系和路径信息，节点数为 O(k)（k 为关键节点数），常用于处理与关键节点相关的树上问题，避免遍历整棵树。</p>
+  
+</article>
+<article class="card" data-name="树分治" data-price="60">
+  <div class="card-top">
+    <div class="index">22</div>
+    <div class="price">¥ 60</div>
+  </div>
+  <h2>树分治</h2>
+  <p class="desc">利用树的重心或点分治、边分治等策略，将树上的问题分解为经过某个中心节点和不经过该中心节点两类子问题，递归处理。常见的有点分治（处理路径统计问题）和边分治。时间复杂度通常为 O(N log N) 或 O(N log² N)。</p>
+  
+</article>
+<article class="card" data-name="拓扑排序 / dag" data-price="30">
+  <div class="card-top">
+    <div class="index">23</div>
+    <div class="price">¥ 30</div>
+  </div>
+  <h2>拓扑排序 / DAG</h2>
+  <p class="desc">对有向无环图（DAG）的所有顶点进行线性排序，使得对于每一条有向边 (u, v)，u 在排序中都出现在 v 之前。可通过 Kahn 算法（不断删除入度为 0 的节点）或 DFS 实现。常用于判断图是否有环、求解 DAG 上的最长路/最短路、依赖关系处理等。</p>
+  
+</article>
+<article class="card" data-name="最短路 / 差分约束" data-price="60">
+  <div class="card-top">
+    <div class="index">24</div>
+    <div class="price">¥ 60</div>
+  </div>
+  <h2>最短路 / 差分约束</h2>
+  <p class="desc">最短路：在带权图中求两点之间的最短路径。常见算法包括 Dijkstra（非负权，O((N+M)log N)）、Bellman-Ford（可处理负权，O(NM)）、SPFA（队列优化 Bellman-Ford）、Floyd（全源最短路，O(N³)）。<br><br>差分约束：将形如 x_i − x_j ≤ c 的不等式组转化为图论中的最短路问题。对每个不等式建边 j → i 权值为 c，若图中有负环则无解，否则最短路给出可行解。</p>
+  
+</article>
+<article class="card" data-name="生成树算法" data-price="50">
+  <div class="card-top">
+    <div class="index">25</div>
+    <div class="price">¥ 50</div>
+  </div>
+  <h2>生成树算法</h2>
+  <p class="desc">在无向连通图中求一棵包含所有顶点的树，使得边权之和最小（最小生成树，MST）。常用算法有 Kruskal（基于并查集，按边权排序后从小到大加边）和 Prim（基于优先队列，从某点开始扩展）。时间复杂度分别为 O(M log M) 和 O((N+M)log N)。</p>
+  
+</article>
+<article class="card" data-name="强连通分量" data-price="50">
+  <div class="card-top">
+    <div class="index">26</div>
+    <div class="price">¥ 50</div>
+  </div>
+  <h2>强连通分量</h2>
+  <p class="desc">在有向图中，如果两个顶点互相可达，则称它们强连通。强连通分量（SCC） 是极大的强连通子图。常用 Tarjan 算法或 Kosaraju 算法在 O(N+M) 时间内求出所有 SCC。缩点后得到 DAG，可用于解决 2-SAT、传递闭包等问题。</p>
+  
+</article>
+<article class="card" data-name="边双连通分量" data-price="50">
+  <div class="card-top">
+    <div class="index">27</div>
+    <div class="price">¥ 50</div>
+  </div>
+  <h2>边双连通分量</h2>
+  <p class="desc">在无向图中，若去掉任意一条边后图的连通性不变，则称该图为边双连通的。边双连通分量（边双） 是极大的边双连通子图。可通过 Tarjan 算法求桥（割边），删去所有桥后每个连通块即为一个边双连通分量。</p>
+  
+</article>
+<article class="card" data-name="点双连通分量 / 圆方树" data-price="60">
+  <div class="card-top">
+    <div class="index">28</div>
+    <div class="price">¥ 60</div>
+  </div>
+  <h2>点双连通分量 / 圆方树</h2>
+  <p class="desc">点双连通分量（点双）：在无向图中，若去掉任意一个顶点后图的连通性不变，则称该图为点双连通的。极大的点双连通子图称为点双连通分量。两个点双至多共享一个顶点（割点）。<br><br>圆方树：将原图的每个点作为圆点，每个点双连通分量作为方点，在方点和属于该点双的所有圆点之间连边，形成一棵树。圆方树将图上的问题转化为树上的问题，常用于处理仙人掌图、动态图连通性等。</p>
+  
+</article>
+<article class="card" data-name="网络流" data-price="80">
+  <div class="card-top">
+    <div class="index">29</div>
+    <div class="price">¥ 80</div>
+  </div>
+  <h2>网络流</h2>
+  <p class="desc">研究有向图中从源点到汇点的流量分配问题。核心是最大流（在容量限制下从 s 到 t 的最大流量），常用算法有 Dinic（O(N²M)）、ISAP、HLPP 等。最小割是最大流的对偶问题。费用流在最大流基础上增加单位流量费用，求最小费用最大流，常用 SSP（SPFA 增广）、Dinic + 势能（Primal-Dual）等。</p>
+  
+</article>
+<article class="card" data-name="扫描线" data-price="50">
+  <div class="card-top">
+    <div class="index">30</div>
+    <div class="price">¥ 50</div>
+  </div>
+  <h2>扫描线</h2>
+  <p class="desc">将二维问题转化为一维问题的离线算法。通常按照某一坐标轴方向扫描，用数据结构（如线段树、树状数组）维护当前扫描线位置上的信息。常用于矩形面积并、矩形周长并、平面最近点对等问题。</p>
+  
+</article>
+<article class="card" data-name="凸包" data-price="40">
+  <div class="card-top">
+    <div class="index">31</div>
+    <div class="price">¥ 40</div>
+  </div>
+  <h2>凸包</h2>
+  <p class="desc">平面点集的最小凸多边形，包含所有给定点。常用算法有 Graham 扫描（O(N log N)）和 Andrew 单调链算法（O(N log N)）。凸包是计算几何的基础，可用于求解最远点对（旋转卡壳）、点与多边形关系等。</p>
+  
+</article>
+<article class="card" data-name="cdq 分治" data-price="60">
+  <div class="card-top">
+    <div class="index">32</div>
+    <div class="price">¥ 60</div>
+  </div>
+  <h2>CDQ 分治</h2>
+  <p class="desc">一种离线分治算法，通过对操作序列按时间分治，处理左半部分对右半部分的贡献。可将动态问题转化为静态问题，常用于三维偏序（CDQ 分治 + 树状数组）、动态 DP 等。时间复杂度通常为 O(N log² N)。</p>
+  
+</article>
+<article class="card" data-name="插头 dp" data-price="30">
+  <div class="card-top">
+    <div class="index">33</div>
+    <div class="price">¥ 30</div>
+  </div>
+  <h2>插头 DP</h2>
+  <p class="desc">一种基于连通性状态压缩的 DP。在网格图上逐格转移，使用括号表示法或最小表示法记录已处理格子的连通性状态。常用于格点图的哈密顿路径/回路计数、棋盘染色方案计数等。</p>
+  <div class="note"><span>注</span>此类属于状压 DP 的子类。</div>
+</article>
+<article class="card" data-name="斜率优化 dp" data-price="50">
+  <div class="card-top">
+    <div class="index">34</div>
+    <div class="price">¥ 50</div>
+  </div>
+  <h2>斜率优化 DP</h2>
+  <p class="desc">针对形如 dp[i] = min/max { dp[j] + a[i]·b[j] + c[i] } 的 DP 转移方程，将决策点 (b[j], dp[j]) 视为平面上的点，用单调队列维护凸包（下凸包求最小值，上凸包求最大值），将 O(N²) 的转移优化到 O(N)。要求斜率（决策点之间的斜率）具有单调性。</p>
+  
+</article>
+<article class="card" data-name="多项式算法" data-price="50">
+  <div class="card-top">
+    <div class="index">35</div>
+    <div class="price">¥ 50</div>
+  </div>
+  <h2>多项式算法</h2>
+  <p class="desc">涉及多项式（形式幂级数）的各种运算，包括但不限于：快速傅里叶变换（FFT）/ 数论变换（NTT）实现多项式乘法、多项式求逆、多项式开根、多项式 ln/exp、多项式求导/积分、多项式多点求值、多项式插值等。时间复杂度通常为 O(N log N) 或 O(N log² N)。</p>
+  
+</article>
+<article class="card" data-name="线性规划" data-price="20">
+  <div class="card-top">
+    <div class="index">36</div>
+    <div class="price">¥ 20</div>
+  </div>
+  <h2>线性规划</h2>
+  <p class="desc">在一组线性不等式（约束条件）的约束下，求解线性目标函数的最大值或最小值。标准形式为 max c^T x s.t. Ax ≤ b, x ≥ 0。常用算法有单纯形法（实践中高效，但最坏情况指数级）和内点法（多项式时间）。在算法竞赛中通常指单纯形法及其变体。</p>
+  
+</article>
+<article class="card" data-name="分数规划" data-price="30">
+  <div class="card-top">
+    <div class="index">37</div>
+    <div class="price">¥ 30</div>
+  </div>
+  <h2>分数规划</h2>
+  <p class="desc">求解形如最大化（或最小化）Σ a_i / Σ b_i 的比值优化问题。常用二分答案 + 判定（将原问题转化为 Σ (a_i − mid·b_i) ≥ 0 的判定问题）。常见于最优比率生成树、最优比率环（01分数规划）等问题。</p>
+  
+</article>
+<article class="card" data-name="线段树合并 / 分裂" data-price="60">
+  <div class="card-top">
+    <div class="index">38</div>
+    <div class="price">¥ 60</div>
+  </div>
+  <h2>线段树合并 / 分裂</h2>
+  <p class="desc">线段树合并：将两棵权值线段树对应节点合并，通常用于树上启发式合并（DSU on tree）或维护每个节点的多重集信息，总复杂度 O(N log N)。<br><br>线段树分裂：将一棵权值线段树按值域分裂为两棵，用于维护可分裂的集合（如区间操作中的分离）。常用于珂朵莉树的替代、可持久化可分裂线段树等。</p>
+  
+</article>
+<article class="card" data-name="李超线段树" data-price="50">
+  <div class="card-top">
+    <div class="index">39</div>
+    <div class="price">¥ 50</div>
+  </div>
+  <h2>李超线段树</h2>
+  <p class="desc">一种维护线段（或直线）集合的数据结构，支持插入一条线段/直线，以及查询在某个 x 坐标处所有线段中的最大值/最小值。每个节点维护一条在该节点区间中点处取值最优的线段，插入时与子节点比较并下放，查询时沿根到叶子的路径取最值。时间复杂度 O(log² N)（线段插入）或 O(log N)（直线插入）。</p>
+  
+</article>
+<article class="card" data-name="猫树" data-price="20">
+  <div class="card-top">
+    <div class="index">40</div>
+    <div class="price">¥ 20</div>
+  </div>
+  <h2>猫树</h2>
+  <p class="desc">一种支持静态区间查询（可重复贡献问题，如区间最值、区间 gcd 等）的数据结构。通过分治预处理每个区间中点向左右扩展的信息，查询时找到 l 和 r 所在子树的分治中点，O(1) 合并左右信息。预处理 O(N log N)，查询 O(1)。</p>
+  <div class="note"><span>注</span>注意：不适用于不满足结合律或不可重复贡献的问题。</div>
+</article>
+<article class="card" data-name="可持久化线段树" data-price="70">
+  <div class="card-top">
+    <div class="index">41</div>
+    <div class="price">¥ 70</div>
+  </div>
+  <h2>可持久化线段树</h2>
+  <p class="desc">在普通线段树的基础上，每次修改时创建新版本，保留旧版本的所有信息（即“可持久化”——可访问历史版本）。每次修改只新建被修改的 O(log N) 个节点，其余节点复用旧版本的节点。支持在任意历史版本上查询和修改。常见应用包括静态区间第 k 小（主席树）。</p>
+  
+</article>
+<article class="card" data-name="可持久化平衡树及其他可持久化数据结构" data-price="70">
+  <div class="card-top">
+    <div class="index">42</div>
+    <div class="price">¥ 70</div>
+  </div>
+  <h2>可持久化平衡树及其他可持久化数据结构</h2>
+  <p class="desc">将可持久化思想应用于平衡树（如可持久化 Treap、可持久化 Splay 等）及其他数据结构。每次修改操作创建新节点并复用未修改部分，保留所有历史版本。支持在任意历史版本上进行查询和修改，时间复杂度 O(log N)。</p>
+  
+</article>
+<article class="card" data-name="树套树" data-price="80">
+  <div class="card-top">
+    <div class="index">43</div>
+    <div class="price">¥ 80</div>
+  </div>
+  <h2>树套树</h2>
+  <p class="desc">将一种树形数据结构嵌套在另一种树形数据结构中，用于处理多维问题。最常见的是线段树套平衡树（外层线段树维护区间，内层平衡树维护区间内的有序信息），支持动态区间排名、区间第 k 小、区间前驱/后继等操作。时间复杂度 O(log² N) 或 O(log³ N)。也可推广到树状数组套主席树、线段树套线段树（二维线段树）等。</p>
+  
+</article>
+<article class="card" data-name="lct 及其他动态树" data-price="80">
+  <div class="card-top">
+    <div class="index">44</div>
+    <div class="price">¥ 80</div>
+  </div>
+  <h2>LCT 及其他动态树</h2>
+  <p class="desc">Link-Cut Tree（LCT）：一种支持动态森林维护的数据结构，支持加边（Link）、删边（Cut）、换根（Makeroot）、路径查询/修改等操作，所有操作均摊 O(log N)。基于实链剖分和 Splay 实现。<br><br>其他动态树：包括 Top Tree（支持更一般的动态树操作）、ETT（欧拉游览树，支持子树操作）等。本条目涵盖所有支持动态加边/删边并维护树上路径信息的树形数据结构。</p>
+  
+</article>
+<article class="card" data-name="珂朵莉树" data-price="10">
+  <div class="card-top">
+    <div class="index">45</div>
+    <div class="price">¥ 10</div>
+  </div>
+  <h2>珂朵莉树</h2>
+  <p class="desc">一种基于 std::set 的暴力数据结构，将值相同的连续区间合并为一个节点（区间赋值操作）。仅适用于数据随机或带有区间赋值操作（assign）的场景，最坏情况下时间复杂度可能退化为 O(N²)，但在随机数据下表现良好。核心操作是 split(pos) 将包含 pos 的区间分裂。</p>
+  
+</article>
+<article class="card" data-name="快速幂" data-price="30">
+  <div class="card-top">
+    <div class="index">46</div>
+    <div class="price">¥ 30</div>
+  </div>
+  <h2>快速幂</h2>
+  <p class="desc">快速计算底数的 n 次幂的算法，时间复杂度 O(log n)。核心思想是将指数 n 按二进制拆分为若干 2 的幂之和，通过反复平方底数并累乘对应项来得到结果。矩阵快速幂是将普通乘法推广到矩阵乘法，用于快速求矩阵的 n 次方。</p>
+  
+</article>
+<article class="card" data-name="模拟退火" data-price="30">
+  <div class="card-top">
+    <div class="index">47</div>
+    <div class="price">¥ 30</div>
+  </div>
+  <h2>模拟退火</h2>
+  <p class="desc">一种基于物理退火原理的随机化全局优化算法。通过模拟固体退火过程中粒子逐渐趋于能量最低状态的过程，在搜索过程中以一定概率接受劣解，从而避免陷入局部最优。温度参数随时间逐渐降低，接受劣解的概率也随之减小。</p>
+  
+</article>
+<article class="card" data-name="遗传算法" data-price="20">
+  <div class="card-top">
+    <div class="index">48</div>
+    <div class="price">¥ 20</div>
+  </div>
+  <h2>遗传算法</h2>
+  <p class="desc">一种基于自然选择和遗传学原理的随机化搜索算法。通过模拟生物进化过程中的选择、交叉（杂交）和变异等操作，在解空间中迭代搜索最优解。适用于求解传统优化方法难以处理的复杂问题。</p>
+  
+</article>
+<article class="card" data-name="爬山算法" data-price="10">
+  <div class="card-top">
+    <div class="index">49</div>
+    <div class="price">¥ 10</div>
+  </div>
+  <h2>爬山算法</h2>
+  <p class="desc">一种简单的局部搜索算法。从当前解出发，不断向邻域中更优的解移动，直到无法找到更优解为止（到达局部最优）。容易陷入局部最优，通常作为其他算法的子过程或结合随机重启使用。</p>
+  
+</article>
+<article class="card" data-name="manacher（马拉车）" data-price="30">
+  <div class="card-top">
+    <div class="index">50</div>
+    <div class="price">¥ 30</div>
+  </div>
+  <h2>Manacher（马拉车）</h2>
+  <p class="desc">一种在线性时间 O(N) 内求出一个字符串的所有回文子串的算法。通过维护当前最右回文边界和对称中心，利用回文的对称性避免重复计算，在扫描过程中同时计算出以每个位置为中心的最长回文半径。</p>
+  
+</article>
+<article class="card" data-name="z 函数（扩展 kmp）" data-price="30">
+  <div class="card-top">
+    <div class="index">51</div>
+    <div class="price">¥ 30</div>
+  </div>
+  <h2>Z 函数（扩展 KMP）</h2>
+  <p class="desc">对于字符串 S，定义 Z 数组 Z[i] 为 S 与 S[i..n-1] 的最长公共前缀（LCP）长度。可在 O(N) 时间内求出。常用于字符串匹配（可作为 KMP 的替代）、求所有前缀的出现次数等。</p>
+  
+</article>
+<article class="card" data-name="后缀数组" data-price="50">
+  <div class="card-top">
+    <div class="index">52</div>
+    <div class="price">¥ 50</div>
+  </div>
+  <h2>后缀数组</h2>
+  <p class="desc">将一个字符串的所有后缀按字典序排序后得到的数组，以及辅助的 rank 数组和 height 数组（LCP 数组）。常用倍增法或 DC3 算法在 O(N log N) 或 O(N) 时间内构建。结合 height 数组可高效解决最长重复子串、不同子串个数、最长公共子串等字符串问题。</p>
+  
+</article>
+<article class="card" data-name="后缀平衡树" data-price="40">
+  <div class="card-top">
+    <div class="index">53</div>
+    <div class="price">¥ 40</div>
+  </div>
+  <h2>后缀平衡树</h2>
+  <p class="desc">一种支持动态维护字符串后缀集合的平衡树结构。可在 O(log N) 时间内支持在字符串末尾追加字符并维护所有后缀的字典序，常用于动态字符串的 Lyndon 分解、后缀数组的动态维护等。</p>
+  
+</article>
+<article class="card" data-name="回文自动机（pam）" data-price="40">
+  <div class="card-top">
+    <div class="index">54</div>
+    <div class="price">¥ 40</div>
+  </div>
+  <h2>回文自动机（PAM）</h2>
+  <p class="desc">一种专门处理回文串的自动机数据结构，类似后缀自动机但针对回文串设计。每个状态代表一个本质不同的回文子串，转移边代表在回文串两端各加一个相同字符得到的新回文串。可在 O(N) 时间内构建，支持在线追加字符。</p>
+  
+</article>
+<article class="card" data-name="广义后缀自动机" data-price="60">
+  <div class="card-top">
+    <div class="index">55</div>
+    <div class="price">¥ 60</div>
+  </div>
+  <h2>广义后缀自动机</h2>
+  <p class="desc">将后缀自动机从单串推广到多串。可同时处理多个字符串的所有子串信息，常用于多串的最长公共子串、多串中不同子串计数等问题。</p>
+  
+</article>
+<article class="card" data-name="左偏树" data-price="30">
+  <div class="card-top">
+    <div class="index">56</div>
+    <div class="price">¥ 30</div>
+  </div>
+  <h2>左偏树</h2>
+  <p class="desc">一种可并堆（可合并优先队列），支持合并两个堆、插入元素、删除堆顶等操作，所有操作时间复杂度 O(log N)。核心性质是左偏（任意节点的左子树距离不小于右子树距离），合并操作基于递归实现。</p>
+  
+</article>
+<article class="card" data-name="2-sat" data-price="30">
+  <div class="card-top">
+    <div class="index">57</div>
+    <div class="price">¥ 30</div>
+  </div>
+  <h2>2-SAT</h2>
+  <p class="desc">判定是否存在一组布尔变量的赋值，使得所有给定的二元子句（形如 (a ∨ b) 或 (¬a ∨ b) 等）同时成立。通过将每个变量拆为真、假两个节点建图，利用 Tarjan 求 SCC 判定可行性，并在有解时构造一组解。时间复杂度 O(N+M)。</p>
+  
+</article>
+<article class="card" data-name="匈牙利算法" data-price="30">
+  <div class="card-top">
+    <div class="index">58</div>
+    <div class="price">¥ 30</div>
+  </div>
+  <h2>匈牙利算法</h2>
+  <p class="desc">求解二分图最大匹配的经典算法。通过不断寻找增广路来增加匹配数，每次从一个未匹配的左部点出发，尝试为它找到一个可匹配的右部点，若冲突则递归调整。时间复杂度 O(VE)。</p>
+  
+</article>
+<article class="card" data-name="km 算法" data-price="40">
+  <div class="card-top">
+    <div class="index">59</div>
+    <div class="price">¥ 40</div>
+  </div>
+  <h2>KM 算法</h2>
+  <p class="desc">求解二分图最大权完美匹配的算法（Kuhn-Munkres 算法）。通过维护每个左部点和右部点的顶标（可行顶标），不断调整顶标并寻找增广路，最终得到最大权匹配。时间复杂度 O(N³)。</p>
+  
+</article>
+<article class="card" data-name="最小表示法" data-price="20">
+  <div class="card-top">
+    <div class="index">60</div>
+    <div class="price">¥ 20</div>
+  </div>
+  <h2>最小表示法</h2>
+  <p class="desc">在线性时间内求出一个字符串（或环状序列）的最小字典序表示。通过双指针比较两个起始位置的循环同构串，跳过不可能成为最小表示的位置，最终 O(N) 得到结果。常用于判断两个字符串是否循环同构。</p>
+  
+</article>
+<article class="card" data-name="哈夫曼树" data-price="20">
+  <div class="card-top">
+    <div class="index">61</div>
+    <div class="price">¥ 20</div>
+  </div>
+  <h2>哈夫曼树</h2>
+  <p class="desc">一种带权路径长度最短的二叉树（最优二叉树）。通过每次合并权值最小的两个节点构建，广泛应用于数据压缩（哈夫曼编码）。k 叉哈夫曼树是将其推广到每次合并 k 个节点。</p>
+  
+</article>
+<article class="card" data-name="替罪羊树" data-price="30">
+  <div class="card-top">
+    <div class="index">62</div>
+    <div class="price">¥ 30</div>
+  </div>
+  <h2>替罪羊树</h2>
+  <p class="desc">一种基于“部分重构”的平衡树。不通过旋转维持平衡，而是在插入/删除后检查子树是否失衡（通过设定平衡因子 α），若失衡则将该子树完全重构（拍扁重建）。均摊 O(log N)，实现简单，支持可持久化。</p>
+  
+</article>
+<article class="card" data-name="跳表" data-price="20">
+  <div class="card-top">
+    <div class="index">63</div>
+    <div class="price">¥ 20</div>
+  </div>
+  <h2>跳表</h2>
+  <p class="desc">一种基于多级链表的随机化数据结构，通过在有序链表上增加多层索引实现快速查找。查找、插入、删除的期望时间复杂度均为 O(log N)。实现比平衡树简单，常数较小，是 Redis 等系统中有序集合的底层实现。</p>
+  
+</article>
+  </section>
+  <div class="empty" id="empty">
+    <div style="font-size:38px;margin-bottom:10px">⌕</div>
+    没有找到匹配的条目
+  </div>
+</main>
+
+<footer>Algorithm Catalog · White Edition</footer>
+
+<script>
+const grid = document.getElementById('grid');
+const cards = [...grid.querySelectorAll('.card')];
+const search = document.getElementById('search');
+const sort = document.getElementById('sort');
+const count = document.getElementById('count');
+const empty = document.getElementById('empty');
+const reset = document.getElementById('reset');
+const pills = [...document.querySelectorAll('.price-pill')];
+let selectedPrice = 'all';
+
+function apply(){
+  const q = search.value.trim().toLowerCase();
+  let visible = cards.filter(card => {
+    const okPrice = selectedPrice === 'all' || card.dataset.price === selectedPrice;
+    const okText = !q || card.textContent.toLowerCase().includes(q);
+    card.style.display = okPrice && okText ? '' : 'none';
+    return okPrice && okText;
+  });
+  if(sort.value === 'price-asc') visible.sort((a,b)=>+a.dataset.price-+b.dataset.price);
+  if(sort.value === 'price-desc') visible.sort((a,b)=>+b.dataset.price-+a.dataset.price);
+  if(sort.value === 'name') visible.sort((a,b)=>a.dataset.name.localeCompare(b.dataset.name,'zh-CN'));
+  if(sort.value === 'default') visible.sort((a,b)=>cards.indexOf(a)-cards.indexOf(b));
+  visible.forEach(c=>grid.appendChild(c));
+  count.textContent = `显示 ${visible.length} / 63 项`;
+  empty.style.display = visible.length ? 'none' : 'block';
+  grid.style.display = visible.length ? 'grid' : 'none';
+}
+
+search.addEventListener('input', apply);
+sort.addEventListener('change', apply);
+pills.forEach(p=>p.addEventListener('click',()=>{
+  selectedPrice=p.dataset.price;
+  pills.forEach(x=>x.classList.toggle('active',x===p));
+  apply();
+}));
+reset.addEventListener('click',()=>{
+  search.value=''; sort.value='default'; selectedPrice='all';
+  pills.forEach(x=>x.classList.toggle('active',x.dataset.price==='all'));
+  apply();
+});
+</script>
+<script src="/register-sw.js" defer></script></body>
+</html>
