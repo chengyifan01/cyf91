@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>03:17 / 回波站：断层档案</title>
+<style>
+:root{
+  --bg:#090c12;--panel:#111722;--panel2:#151d2a;--panel3:#0c1119;
+  --text:#e7edf5;--muted:#8c98aa;--line:#2b3648;--line2:#3b4a62;
+  --cyan:#78d7cf;--amber:#e0bd6f;--red:#e47d86;--blue:#83a8ff;--green:#8ed39a;
+  --shadow:0 20px 70px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:
+ radial-gradient(circle at 10% 0,rgba(120,215,207,.07),transparent 27%),
+ radial-gradient(circle at 92% 90%,rgba(131,168,255,.06),transparent 32%),var(--bg);
+ color:var(--text);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.4}
+.noise{position:fixed;inset:0;pointer-events:none;opacity:.032;z-index:99;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.shell{max-width:1380px;margin:auto;padding:20px 16px 42px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:12px}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--cyan);box-shadow:0 0 18px rgba(120,215,207,.7)}
+.brand h1{font-size:18px;letter-spacing:.08em;margin:0}
+.brand small{display:block;color:var(--muted);margin-top:3px}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap}
+.layout{display:grid;grid-template-columns:250px minmax(0,1fr) 320px;gap:14px}
+.card{border:1px solid var(--line);background:linear-gradient(180deg,rgba(18,24,35,.97),rgba(12,17,25,.97));border-radius:16px;box-shadow:var(--shadow)}
+.nav{padding:14px;height:max-content;position:sticky;top:14px}
+.main{min-height:740px;padding:24px}
+.side{padding:16px;height:max-content;position:sticky;top:14px}
+.section-label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:3px 0 9px}
+.room-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;border:1px solid transparent;background:transparent;color:#c9d2df;border-radius:10px;padding:10px 11px;margin:3px 0;transition:.16s}
+.room-btn:hover{background:#17202d;border-color:#28364a}
+.room-btn.active{border-color:rgba(120,215,207,.42);background:rgba(120,215,207,.08);color:#dff9f5}
+.room-btn.locked{color:#667284}
+.badge{font-size:10px;border:1px solid var(--line);border-radius:999px;padding:2px 6px;color:#8390a3;white-space:nowrap}
+.badge.ok{border-color:rgba(120,215,207,.4);color:var(--cyan)}
+.badge.gold{border-color:rgba(224,189,111,.45);color:var(--amber)}
+.hub-note{border-top:1px solid var(--line);margin-top:12px;padding-top:12px;color:#748095;font-size:11px;line-height:1.6}
+.chapter{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);margin-bottom:9px}
+h2{font-size:29px;margin:0 0 10px}
+.lead{color:#c9d2df;line-height:1.85;white-space:pre-line;margin:0}
+.story{margin:18px 0;border-left:3px solid var(--line2);padding:4px 0 4px 15px;color:#d2dae6;line-height:1.8}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
+.object{border:1px solid var(--line);background:#121925;color:var(--text);border-radius:12px;padding:13px 14px;text-align:left;transition:.15s}
+.object:hover{transform:translateY(-1px);background:#182231;border-color:#46566e}
+.object.seen{border-color:#34475e;color:#b9cadb}
+.object.secret.seen{border-color:rgba(224,189,111,.5);color:#ecd7a4}
+.object strong{display:block;font-size:13px;margin-bottom:4px}
+.object span{font-size:11px;color:#778599}
+.panel{margin-top:18px;border:1px solid #2b3850;background:#0d131c;border-radius:13px;padding:17px}
+.panel h3{font-size:15px;margin:0 0 8px}
+.panel p{font-size:13px;line-height:1.68;color:#99a6b8;margin:0 0 13px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:#151d29;color:var(--text);border-radius:10px;padding:10px 13px;transition:.15s}
+.btn:hover:not(:disabled){background:#1a2534;border-color:#53647d;transform:translateY(-1px)}
+.btn.primary{border-color:rgba(120,215,207,.45);background:rgba(120,215,207,.09)}
+.btn.gold{border-color:rgba(224,189,111,.5);background:rgba(224,189,111,.08)}
+.btn.red{border-color:rgba(228,125,134,.4);background:rgba(228,125,134,.08)}
+.btn.ghost{background:transparent;color:#9ba8b9}
+input[type=text],input[type=number]{flex:1;min-width:120px;background:#080d14;border:1px solid var(--line);border-radius:9px;padding:11px 12px;color:var(--text);outline:none}
+input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(120,215,207,.06)}
+.status{min-height:21px;font-size:12px;color:var(--muted);margin-top:9px}
+.status.ok{color:var(--cyan)}.status.bad{color:var(--red)}.status.gold{color:var(--amber)}
+.detail{margin-top:14px;border:1px solid #263348;background:#0b1018;border-radius:12px;padding:14px;line-height:1.75;color:#c7d0dc;font-size:13px}
+.detail b{color:#eef4fb}
+.doc{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#080c12;border:1px solid #273146;border-radius:10px;padding:13px;color:#b8c6d9;line-height:1.75;overflow:auto;white-space:pre-wrap}
+.logic{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.switch{border:1px solid var(--line);border-radius:11px;padding:14px 8px;text-align:center;background:#111823;color:#9eaabc}
+.switch.on{border-color:rgba(120,215,207,.55);background:rgba(120,215,207,.1);color:#dff8f5}
+.freqs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.freq{border:1px solid var(--line);background:#111925;border-radius:10px;padding:12px;color:#d6deea;text-align:center}
+.freq.selected{border-color:var(--blue);background:rgba(131,168,255,.1)}
+.sequence{min-height:32px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:10px 0}
+.chip{border:1px solid var(--line);background:#101720;border-radius:999px;padding:5px 8px;font-size:11px;color:#b8c4d4}
+.progressline{height:6px;background:#090d13;border-radius:99px;overflow:hidden;margin:7px 0 13px}
+.progressline i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:.3s}
+.statline{display:flex;justify-content:space-between;gap:12px;font-size:12px;color:#a6b1c0;margin:7px 0}
+.inventory,.clues{display:flex;flex-wrap:wrap;gap:6px}
+.item{font-size:11px;border:1px solid #334056;border-radius:8px;padding:5px 7px;color:#b8c3d2;background:#0f151e}
+.item.shard{border-color:rgba(131,168,255,.4);color:#bccdff}
+.item.secret{border-color:rgba(224,189,111,.45);color:#e4ce99}
+.clue-list{display:grid;gap:7px;max-height:285px;overflow:auto;padding-right:2px}
+.clue{border:1px solid var(--line);border-radius:9px;padding:8px 9px;background:#0e151f}
+.clue b{display:block;font-size:11px;margin-bottom:3px}
+.clue span{font-size:10px;line-height:1.5;color:#8996a8}
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tab{flex:1;border:1px solid var(--line);background:#101720;color:#8f9caf;border-radius:8px;padding:7px;font-size:11px}
+.tab.active{color:#dfe8f4;border-color:#43536c}
+.hint{border-top:1px solid var(--line);padding-top:12px;margin-top:13px}
+.hint-text{min-height:56px;font-size:12px;line-height:1.6;color:#9ca8b8;margin-top:8px}
+.callout{border:1px solid rgba(120,215,207,.3);background:rgba(120,215,207,.06);border-radius:12px;padding:14px;margin:15px 0}
+.callout.gold{border-color:rgba(224,189,111,.35);background:rgba(224,189,111,.055)}
+.callout.red{border-color:rgba(228,125,134,.32);background:rgba(228,125,134,.055)}
+.callout p{margin:6px 0 0;line-height:1.8;color:#d2dae5}
+.choice-list{display:grid;gap:9px;margin-top:14px}
+.choice{width:100%;text-align:left}
+.evidence-grid{display:grid;gap:8px;margin-top:12px}
+.statement{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:11px;background:#0f1620}
+.statement input{margin-top:3px}
+.statement label{line-height:1.55;color:#c5cfdd;font-size:13px}
+.start{min-height:680px;display:grid;place-items:center;text-align:center;padding:24px}
+.start-in{max-width:680px}
+.bigtime{font-size:54px;letter-spacing:.1em;color:var(--red);font-variant-numeric:tabular-nums;margin:8px 0}
+.start p{line-height:1.85;color:#aeb9c8}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:20px 0}
+.rule{border:1px solid var(--line);border-radius:10px;padding:10px;font-size:11px;line-height:1.55;color:#94a1b3;background:#0e151e}
+.ending{border:1px solid var(--line);background:#0d141d;border-radius:14px;padding:20px;margin-top:15px}
+.ending h3{font-size:25px;margin:0 0 10px}
+.ending p{white-space:pre-line;line-height:1.9;color:#d1dae6}
+.timer{font-variant-numeric:tabular-nums;color:#a8b5c6}
+.toast{position:fixed;z-index:100;left:50%;bottom:22px;transform:translate(-50%,18px);opacity:0;pointer-events:none;background:#182130;border:1px solid #41516b;border-radius:999px;padding:9px 15px;font-size:12px;transition:.22s;box-shadow:var(--shadow)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:1050px){.layout{grid-template-columns:210px minmax(0,1fr)}.side{grid-column:1/-1;position:static}.side-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}}
+@media(max-width:760px){.layout{display:block}.nav,.side{position:static;margin-bottom:12px}.nav-list{display:grid;grid-template-columns:repeat(2,1fr)}.main{min-height:0}.side-grid{display:block}}
+@media(max-width:520px){.shell{padding:12px 9px 26px}.main{padding:17px}.grid{grid-template-columns:1fr}.rules{grid-template-columns:1fr}.logic{grid-template-columns:repeat(2,1fr)}.bigtime{font-size:40px}h2{font-size:24px}.header-actions{justify-content:flex-end}}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="shell">
+<header>
+  <div class="brand"><span class="dot"></span><div><h1>03:17 / 回波站</h1><small>断层档案 · 非线性调查解谜</small></div></div>
+  <div class="header-actions">
+    <button class="btn ghost" id="soundBtn">声音：开</button>
+    <button class="btn ghost" id="restartBtn">重新开始</button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="card nav">
+    <div class="section-label">Station map</div>
+    <div class="nav-list" id="navList"></div>
+    <div class="hub-note">没有固定章节顺序。部分区域需要道具、供电或替代权限。<br><br>核心区只要求 3 枚档案碎片；想看完整真相，需要更多。</div>
+  </nav>
+
+  <main class="card main" id="main"></main>
+
+  <aside class="card side">
+    <div class="side-grid">
+      <div>
+        <div class="section-label">Investigation</div>
+        <div class="statline"><span>碎片</span><b id="shardCount">0 / 4</b></div>
+        <div class="statline"><span>隐藏证据</span><b id="secretCount">0 / 4</b></div>
+        <div class="statline"><span>错误尝试</span><b id="mistakeCount">0</b></div>
+        <div class="statline"><span>调查时间</span><b class="timer" id="timer">00:00</b></div>
+        <div class="progressline"><i id="progressFill"></i></div>
+
+        <div class="section-label">Inventory</div>
+        <div class="inventory" id="inventory"></div>
+      </div>
+
+      <div>
+        <div class="tabs">
+          <button class="tab active" data-tab="clues">线索簿</button>
+          <button class="tab" data-tab="case">案情板</button>
+        </div>
+        <div id="sideContent"></div>
+      </div>
+    </div>
+
+    <div class="hint">
+      <div class="section-label">Progressive hint</div>
+      <button class="btn ghost" style="width:100%;text-align:center" id="hintBtn">请求本区域提示</button>
+      <div class="hint-text" id="hintText">每个区域有 3 级提示。前两级只提示思路。</div>
+    </div>
+  </aside>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const main=$('#main'), navList=$('#navList'), invEl=$('#inventory'), sideContent=$('#sideContent');
+const shardCount=$('#shardCount'), secretCount=$('#secretCount'), mistakeCount=$('#mistakeCount');
+const progressFill=$('#progressFill'), hintText=$('#hintText'), hintBtn=$('#hintBtn'), timerEl=$('#timer');
+const toastEl=$('#toast'), soundBtn=$('#soundBtn');
+
+const ROOMS=[
+  ['atrium','中央大厅'],
+  ['dorm','值班宿舍'],
+  ['generator','配电间'],
+  ['archive','档案室'],
+  ['radio','无线电室'],
+  ['observatory','观测穹顶'],
+  ['core','B1 核心区']
+];
+
+const SHARDS={
+  memory:'记忆碎片',
+  identity:'身份碎片',
+  signal:'信号碎片',
+  observation:'观测碎片'
+};
+
+const DEFAULT={
+  started:false,room:'atrium',seen:{},clues:[],items:[],shards:[],secrets:[],
+  solved:{dorm:false,generator:false,archive:false,radio:false,observatory:false,deduction:false},
+  flags:{archiveChoice:null,radioReply:null,openedCore:false,finalTheory:false},
+  hintLevels:{},mistakes:0,sound:true,startedAt:null,ending:null,
+  breaker:[false,false,false,false,false,false],freqSeq:[],sideTab:'clues'
+};
+
+const cloneDefault=()=>JSON.parse(JSON.stringify(DEFAULT));
+
+let S=load();
+let timerInt=null;
+
+function load(){
+  try{
+    const x=JSON.parse(localStorage.getItem('echo_station_v2'));
+    if(!x)return cloneDefault();
+    return Object.assign(cloneDefault(),x);
+  }catch(e){return cloneDefault()}
+}
+function save(){localStorage.setItem('echo_station_v2',JSON.stringify(S))}
+function reset(){
+  localStorage.removeItem('echo_station_v2');
+  S=cloneDefault();
+  clearInterval(timerInt);timerInt=null;
+  render();
+}
+function beep(freq=500,dur=.05){
+  if(!S.sound)return;
+  try{
+    const C=window.AudioContext||window.webkitAudioContext;
+    const ctx=window._echoAC||(window._echoAC=new C());
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.frequency.value=freq;o.type='sine';g.gain.value=.025;
+    o.connect(g);g.connect(ctx.destination);o.start();
+    g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+dur);
+    o.stop(ctx.currentTime+dur);
+  }catch(e){}
+}
+function toast(t){
+  toastEl.textContent=t;toastEl.classList.add('show');
+  setTimeout(()=>toastEl.classList.remove('show'),1500);
+}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function hasItem(id){return S.items.some(x=>x.id===id)}
+function hasClue(id){return S.clues.some(x=>x.id===id)}
+function addItem(id,name,type='normal'){
+  if(!hasItem(id)){S.items.push({id,name,type});save();toast('获得：'+name);beep(type==='shard'?820:610,.08)}
+}
+function addShard(id){
+  if(!S.shards.includes(id)){S.shards.push(id);addItem('shard_'+id,SHARDS[id],'shard');save()}
+}
+function addClue(id,title,text,secret=false){
+  if(!hasClue(id)){
+    S.clues.push({id,title,text,secret});
+    if(secret&&!S.secrets.includes(id))S.secrets.push(id);
+    save();toast(secret?'发现隐藏证据':'记录线索');beep(secret?930:560,.07)
+  }
+}
+function inspect(id,title,html,clue=null){
+  S.seen[id]=true;
+  if(clue)addClue(...clue);
+  save();
+  const box=$('#detailBox');
+  if(box)box.innerHTML=`<div class="detail"><b>${title}</b><br>${html}</div>`;
+  renderSide();
+}
+function fail(msg,el){
+  S.mistakes++;save();beep(165,.08);
+  if(el){el.className='status bad';el.textContent=msg}
+  renderSide();
+}
+function success(msg,el){
+  beep(850,.13);
+  if(el){el.className='status ok';el.textContent=msg}
+  save();renderSide();renderNav();
+}
+function canEnter(room){
+  if(room==='core')return S.shards.length>=3;
+  if(room==='radio')return S.solved.generator;
+  if(room==='observatory')return S.solved.generator && (hasItem('brass_key')||hasItem('service_token'));
+  return true;
+}
+function lockReason(room){
+  if(room==='core')return `需要 3 枚档案碎片（当前 ${S.shards.length}）`;
+  if(room==='radio')return '无线电室无供电：先恢复配电';
+  if(room==='observatory'){
+    if(!S.solved.generator)return '穹顶无供电：先恢复配电';
+    return '需要黄铜钥匙或维护权限';
+  }
+  return '';
+}
+function go(room){
+  if(!canEnter(room)){toast(lockReason(room));beep(190,.06);return}
+  S.room=room;S.hintLevels[room]=S.hintLevels[room]||0;save();hintText.textContent='每个区域有 3 级提示。前两级只提示思路。';
+  render();window.scrollTo({top:0,behavior:'smooth'})
+}
+function renderNav(){
+  navList.innerHTML=ROOMS.map(([id,name])=>{
+    const locked=!canEnter(id),active=S.room===id;
+    let tag='';
+    if(['dorm','generator','archive','radio','observatory'].includes(id)&&S.solved[id])tag='<span class="badge ok">完成</span>';
+    else if(id==='core'&&S.flags.openedCore)tag='<span class="badge gold">已进入</span>';
+    else if(locked)tag='<span class="badge">锁定</span>';
+    else tag='<span class="badge">可进入</span>';
+    return `<button class="room-btn ${active?'active':''} ${locked?'locked':''}" onclick="G.go('${id}')"><span>${name}</span>${tag}</button>`;
+  }).join('')
+}
+function renderSide(){
+  shardCount.textContent=`${S.shards.length} / 4`;
+  secretCount.textContent=`${S.secrets.length} / 4`;
+  mistakeCount.textContent=S.mistakes;
+  progressFill.style.width=Math.min(100,(S.shards.length*18)+(S.secrets.length*4)+(S.flags.openedCore?12:0)+(S.solved.deduction?16:0))+'%';
+  invEl.innerHTML=S.items.length?S.items.map(x=>`<span class="item ${x.type==='shard'?'shard':x.type==='secret'?'secret':''}">${esc(x.name)}</span>`).join(''):'<span style="font-size:11px;color:#6f7a8b">空</span>';
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===S.sideTab));
+  if(S.sideTab==='clues'){
+    sideContent.innerHTML=`<div class="clue-list">${S.clues.length?S.clues.slice().reverse().map(c=>`<div class="clue"><b>${esc(c.title)}</b><span style="${c.secret?'color:#d8c28c':''}">${esc(c.text)}</span></div>`).join(''):'<div style="font-size:11px;color:#6f7a8b">调查物品后会自动记录。</div>'}</div>`;
+  }else{
+    const truths=[
+      ['事故起点','03:17 可能只是循环重置点，不一定是事故开始。',hasClue('time_gap')],
+      ['身份索引','林夏的身份索引是事故后被人工删除的。',hasClue('delete_log')],
+      ['白噪声链','白噪声发生器参与回波同步，而不只是降噪。',hasClue('noise_chain')],
+      ['陈博士','存在一次未签字的 03:09 手动校准命令。',hasClue('chen_order')],
+      ['安全空窗','切断同步链后可能出现约 8 秒不稳定窗口。',hasClue('eight_sec')]
+    ];
+    sideContent.innerHTML=`<div class="clue-list">${truths.map(x=>`<div class="clue"><b>${x[2]?'●':'○'} ${x[0]}</b><span>${x[2]?x[1]:'尚无足够证据。'}</span></div>`).join('')}</div>`;
+  }
+}
+function startTimer(){
+  if(timerInt)clearInterval(timerInt);
+  timerInt=setInterval(()=>{
+    if(!S.startedAt||S.ending)return;
+    const sec=Math.floor((Date.now()-S.startedAt)/1000);
+    timerEl.textContent=String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');
+  },1000)
+}
+function renderStart(){
+  main.innerHTML=`<section class="start"><div class="start-in">
+    <div class="chapter">Narrative investigation · recommended 15–35 min</div>
+    <div class="bigtime">03:17</div>
+    <h2>这次，站里有不止一条路。</h2>
+    <p>暴雨封锁了“回波站”。你醒来时，B1 核心区已经自锁。<br>
+    中央终端显示：<b>4 枚档案碎片中任意 3 枚即可重建核心权限。</b><br><br>
+    但墙上有人用记号笔补了一句：<br>
+    “三枚足够开门。四枚才够知道发生了什么。”</p>
+    <div class="rules">
+      <div class="rule"><b>自由调查</b><br>房间没有固定章节顺序，可以回头、换路线、暂时跳过谜题。</div>
+      <div class="rule"><b>跨区域线索</b><br>一个房间看到的数字、规则或权限，可能在另一个房间才有意义。</div>
+      <div class="rule"><b>多结局</b><br>结局由证据完整度、调查选择和最终推理共同决定。</div>
+    </div>
+    <button class="btn primary" id="startBtn" style="min-width:220px">进入回波站</button>
+  </div></section>`;
+  $('#startBtn').onclick=()=>{S.started=true;S.startedAt=Date.now();S.room='atrium';save();beep(650,.1);startTimer();render()}
+}
+
+function renderAtrium(){
+  const available=S.shards.length>=3;
+  main.innerHTML=`
+    <div class="chapter">Central atrium · hub</div>
+    <h2>中央大厅</h2>
+    <p class="lead">大厅里的应急灯一明一灭。五条走廊通向不同区域，没有“下一章”的箭头。
+B1 核心门上有四个六边形插槽，但终端明确写着：<b>任意三枚碎片即可形成临时权限。</b></p>
+    <div class="story">当前可自由调查：值班宿舍、配电间、档案室。<br>
+    无线电室与观测穹顶需要先恢复供电；观测穹顶还需要实体钥匙或维护权限。</div>
+    <div class="grid">
+      <button class="object ${S.seen.map?'seen':''}" onclick="G.inspect('map','站内平面图','平面图上有一条很旧的铅笔标记：宿舍 ↔ 档案室；配电间 → 无线电室 / 观测穹顶。')"><strong>站内平面图</strong><span>查看区域连接</span></button>
+      <button class="object ${S.seen.coreDoor?'seen':''}" onclick="G.inspect('coreDoor','B1 核心门','门锁有四个碎片插槽，但旁边贴着“3/4 quorum”维护标签。安全设计允许一枚碎片缺失。')"><strong>B1 核心门</strong><span>检查权限结构</span></button>
+      <button class="object ${S.seen.cup?'seen':''}" onclick="G.inspect('cup','两只咖啡杯','一只杯底写着 X.M.，另一只写 L.X.。两杯都还有余温，但站内门禁只记录了你一个人。',['two_cups','两只温热的杯子','门禁只记录了你，但桌上有 X.M. 与 L.X. 两只仍有余温的杯子。'])"><strong>两只咖啡杯</strong><span>不符合门禁记录</span></button>
+      <button class="object secret ${S.seen.wallScratch?'seen':''}" onclick="G.inspect('wallScratch','应急灯后的划痕','拆下松动的灯罩后，背板写着：<b>“别把 03:17 当成起点。”</b>',['time_gap','隐藏证据：时间断层','有人明确警告：03:17 不是事故的真正起点。',true])"><strong>松动的应急灯罩</strong><span>似乎被人拆过很多次</span></button>
+    </div>
+    <div id="detailBox"></div>
+    <div class="callout ${available?'gold':''}">
+      <b>${available?'核心临时权限已满足':'核心权限不足'}</b>
+      <p>${available?'你已经拿到至少 3 枚碎片，可以进入 B1。也可以继续寻找第 4 枚和隐藏证据。':`当前只有 ${S.shards.length} 枚碎片。你不需要把每条路线都做完。`}</p>
+      ${available?'<button class="btn gold" style="margin-top:10px" onclick="G.go(\'core\')">进入 B1 核心区</button>':''}
+    </div>`;
+}
+
+function renderDorm(){
+  main.innerHTML=`
+    <div class="chapter">Route A · dormitory</div>
+    <h2>值班宿舍</h2>
+    <p class="lead">这里不像事故现场，更像有人匆忙离开后又回来过很多次。
+墙边有一个四位机械箱。锁旁贴着一句话：<b>“按形状，不按日期。”</b></p>
+    <div class="grid">
+      <button class="object ${S.seen.photoA?'seen':''}" onclick="G.inspect('photoA','照片 A','照片里有 <b>2 只咖啡杯</b>。右下角贴着一个 <b>三角形</b> 标签。',['tri2','照片 A','三角形标签对应画面中 2 只咖啡杯。'])"><strong>照片 A</strong><span>三角形标签</span></button>
+      <button class="object ${S.seen.photoB?'seen':''}" onclick="G.inspect('photoB','照片 B','维修楼外墙有 <b>4 扇亮着的窗</b>。背面盖着 <b>圆形</b> 验收章。',['circle4','照片 B','圆形验收章对应 4 扇亮窗。'])"><strong>照片 B</strong><span>圆形验收章</span></button>
+      <button class="object ${S.seen.photoC?'seen':''}" onclick="G.inspect('photoC','照片 C','天台上只有 <b>1 根主天线</b> 接到实验线圈。边缘被划了一个 <b>方形</b>。',['square1','照片 C','方形记号对应 1 根主天线。'])"><strong>照片 C</strong><span>方形划痕</span></button>
+      <button class="object ${S.seen.lamp?'seen':''}" onclick="G.inspect('lamp','床头灯','灯罩是规则 <b>六边形</b>。底座压着半张便签：<br>“圆先于方；三角最后；缺的那位就看灯。”',['shape_order','半张密码便签','顺序规则：圆 → 方 →（灯罩）→ 三角。'])"><strong>床头灯</strong><span>灯罩不是圆的</span></button>
+      <button class="object ${S.seen.diary?'seen':''}" onclick="G.inspect('diary','林夏的值班本','17 日那页写着：<br>“如果我忘记了，去档案室找 <b>7-14-3</b>。那不是日期，是索引。”',['archive_index','值班本索引','档案室索引：7-14-3。它不是日期。'])"><strong>值班本</strong><span>夹着档案索引</span></button>
+      <button class="object ${S.seen.mirror?'seen':''}" onclick="G.inspect('mirror','镜框夹层','镜框背后藏着一条被折了四次的纸：<br><b>“身份删除发生在回波出现之后。”</b>',['delete_order','删除顺序补记','身份索引的删除发生在回波现象已经出现之后。'])"><strong>裂开的镜框</strong><span>边框比镜面厚得不自然</span></button>
+    </div>
+    <div id="detailBox"></div>
+
+    <div class="panel">
+      <h3>机械箱 · 四位密码</h3>
+      <p>箱盖上刻着四个浅槽：○　□　⬡　△。房间里没有直接写出完整密码。</p>
+      <div class="row"><input id="dormCode" type="text" maxlength="4" inputmode="numeric" placeholder="4 位数字"><button class="btn primary" id="dormBtn">尝试开启</button></div>
+      <div class="status" id="dormStatus">${S.solved.dorm?'已开启。里面的东西已经被你取走。':''}</div>
+    </div>`;
+  $('#dormBtn').onclick=()=>{
+    const st=$('#dormStatus');
+    if(S.solved.dorm){st.className='status ok';st.textContent='箱子已经打开。';return}
+    if($('#dormCode').value.trim()==='4162'){
+      S.solved.dorm=true;addShard('memory');addItem('brass_key','黄铜穹顶钥匙');
+      addClue('memory_note','记忆碎片上的字','“记忆不是证词。先证明时间，再相信我。”');
+      success('咔哒。箱盖弹开：一枚记忆碎片、一把黄铜钥匙。',st);renderNav();
+    }else fail('齿轮转了半圈又退回。至少一位不对。',st)
+  }
+}
+
+function renderGenerator(){
+  const names=['A','B','C','D','E','F'];
+  main.innerHTML=`
+    <div class="chapter">Infrastructure · power room</div>
+    <h2>配电间</h2>
+    <p class="lead">六个断路器控制实验区的独立回路。直接全推上去会触发保护。
+维修板留下的不是答案，而是五条约束。</p>
+    <div class="grid">
+      <button class="object ${S.seen.maint?'seen':''}" onclick="G.inspect('maint','维修板','<div class=&quot;doc&quot;>1. A 与 B 必须一开一关\n2. B 与 E 状态相同\n3. F 与 A 状态相反\n4. C 与 D 状态相反\n5. C 与 F 状态相同</div>',['breaker_rules','断路器约束','A≠B；B=E；F≠A；C≠D；C=F。'])"><strong>维修板</strong><span>五条逻辑约束</span></button>
+      <button class="object ${S.seen.load?'seen':''}" onclick="G.inspect('load','负载表','无线电室与穹顶共用实验母线。只有当六个断路器同时满足维护约束，母线才会恢复。')"><strong>负载表</strong><span>供电目标</span></button>
+      <button class="object ${S.seen.override?'seen':''}" onclick="G.inspect('override','维护权限槽','槽位里卡着一张写有 <b>SRV-09</b> 的维护令牌。它不是密码，而是实体权限片。',['override_note','维护令牌','SRV-09 可以绕过某些旧门锁的实体索引检查。'])"><strong>维护权限槽</strong><span>里面似乎夹着东西</span></button>
+      <button class="object secret ${S.seen.coil?'seen':''}" onclick="G.inspect('coil','同步线圈铭牌','铭牌背后有手写维修补充：<br><b>“同步链断电后约 8 秒进入自由漂移。”</b>',['eight_sec','隐藏证据：8 秒空窗','同步链断电后会出现约 8 秒的自由漂移窗口。',true])"><strong>同步线圈铭牌</strong><span>背面有二次刻字</span></button>
+    </div>
+    <div id="detailBox"></div>
+
+    <div class="panel">
+      <h3>六路断路器</h3>
+      <p>目标不是“全部开启”，而是让当前状态同时满足五条约束。</p>
+      <div class="logic">${names.map((n,i)=>`<button class="switch ${S.breaker[i]?'on':''}" data-i="${i}"><b>${n}</b><br><span>${S.breaker[i]?'ON':'OFF'}</span></button>`).join('')}</div>
+      <div class="row"><button class="btn ghost" id="breakerReset">全部复位</button><button class="btn primary" id="breakerCheck">合闸测试</button></div>
+      <div class="status" id="breakerStatus">${S.solved.generator?'母线供电正常。无线电室与观测穹顶已通电。':''}</div>
+    </div>`;
+  document.querySelectorAll('.switch').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i;S.breaker[i]=!S.breaker[i];save();renderGenerator();renderSide()
+  });
+  $('#breakerReset').onclick=()=>{S.breaker=[false,false,false,false,false,false];save();renderGenerator()};
+  $('#breakerCheck').onclick=()=>{
+    const [a,b,c,d,e,f]=S.breaker,st=$('#breakerStatus');
+    const ok=(a!==b)&&(b===e)&&(f!==a)&&(c!==d)&&(c===f);
+    if(ok){
+      S.solved.generator=true;
+      if(!hasItem('service_token'))addItem('service_token','SRV-09 维护令牌');
+      addClue('noise_chain','配电拓扑','白噪声发生器接在“同步链”而不是音频链上。');
+      success('母线稳定。无线电室与观测穹顶恢复供电。',st);renderNav();
+    }else fail('保护继电器跳开：当前组合仍违反至少一条约束。',st)
+  }
+}
+
+function renderArchive(){
+  const canIndex=hasClue('archive_index')||hasItem('service_token');
+  main.innerHTML=`
+    <div class="chapter">Route B · archive room</div>
+    <h2>档案室</h2>
+    <p class="lead">纸质档案和离线终端都在这里。索引柜需要“卷-页-词”三段索引，
+但维护口也支持 SRV 令牌绕过。</p>
+    <div class="grid">
+      <button class="object ${S.seen.catalog?'seen':''}" onclick="G.inspect('catalog','索引柜说明','索引格式为 <b>卷-页-词</b>。对应位置找到的词，就是终端的检索关键词。')"><strong>索引柜说明</strong><span>解释 7-14-3 之类的编号</span></button>
+      <button class="object ${S.seen.book7?'seen':''}" onclick="G.inspect('book7','第 7 卷 / 第 14 页','页面第三个加粗词是：<b>ECHO</b>。<br><span style=&quot;color:#8793a5&quot;>如果你不知道为什么要翻这一页，它现在可能还没有意义。</span>',['echo_key','档案关键词','7-14-3 指向关键词 ECHO。'])"><strong>第 7 卷事故手册</strong><span>纸页有频繁翻动痕迹</span></button>
+      <button class="object ${S.seen.caesar?'seen':''}" onclick="G.inspect('caesar','终端旁的便签','“离线备份仍用凯撒轮。<b>SHIFT = 检索词的字母数 - 1</b>；解密时向回移。”',['caesar_rule','凯撒轮规则','SHIFT = 检索词字母数 - 1，解密向回移。'])"><strong>终端旁的便签</strong><span>有人嫌旧系统太麻烦</span></button>
+      <button class="object ${S.seen.freqMap?'seen':''}" onclick="G.inspect('freqMap','站点频率表','<div class=&quot;doc&quot;>NORTH  88.4 MHz\nEAST   93.7 MHz\nSOUTH 101.2 MHz\nWEST  107.9 MHz</div>',['freq_map','方向频率表','N=88.4，E=93.7，S=101.2，W=107.9 MHz。'])"><strong>站点频率表</strong><span>四个方位各有一个维护频道</span></button>
+      <button class="object secret ${S.seen.orderLog?'seen':''}" onclick="G.inspect('orderLog','未签字校准单','缓存里残留一条 <b>03:09</b> 的手动校准命令，操作者字段被擦除，但审批模板属于陈博士。',['chen_order','隐藏证据：03:09 校准命令','事故前存在一次未签字的 03:09 手动校准命令，模板属于陈博士。',true])"><strong>打印机缓存</strong><span>有一张没打印完整的作业单</span></button>
+    </div>
+    <div id="detailBox"></div>
+
+    <div class="panel">
+      <h3>离线档案终端</h3>
+      <p>${canIndex?'权限条件已满足。检索关键词可以来自纸质索引，也可以由 SRV-09 绕过第一层。':'终端要求纸质索引关键词或维护令牌。你可以先去别处调查。'}</p>
+      ${canIndex?`
+      <div class="doc">检索命中：ECHO
+备份段：FDXVDO
+提示：SHIFT = keyword.length - 1</div>
+      <div class="row" style="margin-top:10px"><input id="archiveAns" type="text" maxlength="12" placeholder="输入解密后的英文单词"><button class="btn primary" id="archiveBtn">验证</button></div>
+      <div class="status" id="archiveStatus">${S.solved.archive?'备份已解密。身份碎片已取出。':''}</div>
+      `:`<button class="btn" disabled>终端离线锁定</button>`}
+    </div>
+    ${S.solved.archive?`
+      <div class="callout">
+        <b>恢复出的删除日志</b>
+        <p>03:12:44　L.X. 身份索引被人工移出回波锚点表。<br>
+        操作者：X.M.（你的工号）<br>
+        注：删除动作发生时，回波异常已经持续 3 分 11 秒。</p>
+        ${!S.flags.archiveChoice?`<div class="row" style="margin-top:10px">
+          <button class="btn" id="archiveKeep">保留完整日志</button>
+          <button class="btn red" id="archiveQuarantine">隔离操作者字段</button>
+        </div>`:`<div class="status ok">你选择了：${S.flags.archiveChoice==='keep'?'保留完整日志':'隔离操作者字段'}</div>`}
+      </div>`:''}`;
+  if(canIndex&&$('#archiveBtn'))$('#archiveBtn').onclick=()=>{
+    const st=$('#archiveStatus'),v=$('#archiveAns').value.trim().toUpperCase();
+    // ECHO has 4 letters => shift 3; FDXVDO -> CAUSALY? Deliberately accept intended root CAUSAL.
+    if(v==='CAUSAL'||v==='CAUSALY'||v==='CAUSALITY'){
+      S.solved.archive=true;addShard('identity');
+      addClue('delete_log','恢复的删除日志','03:12:44，X.M. 手动移除 L.X. 身份索引；此时回波异常已持续 3 分 11 秒。');
+      success('解密通过。终端弹出一枚“身份碎片”。',st);
+      setTimeout(renderArchive,250);
+    }else fail('终端拒绝：解密结果无法通过语义校验。',st)
+  };
+  if($('#archiveKeep'))$('#archiveKeep').onclick=()=>{S.flags.archiveChoice='keep';save();addClue('kept_log','调查选择','你保留了包含自己工号的完整删除日志。');renderArchive();renderSide()};
+  if($('#archiveQuarantine'))$('#archiveQuarantine').onclick=()=>{S.flags.archiveChoice='quarantine';save();addClue('quarantined_log','调查选择','你隔离了删除日志中的操作者字段，但保留时间戳。');renderArchive();renderSide()};
+}
+
+function renderRadio(){
+  const mapKnown=hasClue('freq_map');
+  main.innerHTML=`
+    <div class="chapter">Route C · radio room</div>
+    <h2>无线电室</h2>
+    <p class="lead">恢复供电后，四个维护频道同时出现周期性脉冲。
+控制台把方向记录写成了：<b>W → N → E → S</b>，但面板只显示频率，不显示方向。</p>
+    <div class="grid">
+      <button class="object ${S.seen.routeLog?'seen':''}" onclick="G.inspect('routeLog','巡检路线日志','凌晨巡检路径被重复写了三遍：<b>WEST → NORTH → EAST → SOUTH</b>。',['route','巡检方向序列','W → N → E → S。'])"><strong>巡检路线日志</strong><span>四个方位</span></button>
+      <button class="object ${S.seen.spectrum?'seen':''}" onclick="G.inspect('spectrum','频谱截图','四个稳定峰分别位于 88.4 / 93.7 / 101.2 / 107.9 MHz。')"><strong>频谱截图</strong><span>四个稳定峰</span></button>
+      <button class="object ${S.seen.audio?'seen':''}" onclick="G.inspect('audio','录音残片','脉冲后有一段断裂语音：“……不是 03:17……从九分开始……别信重置点……”',['voice_fragment','断裂语音','语音声称异常“从九分开始”，03:17 只是重置点。'])"><strong>录音残片</strong><span>有人在白噪声里说话</span></button>
+      <button class="object ${S.seen.phase?'seen':''}" onclick="G.inspect('phase','相位监视器','把脉冲相位展开后，白噪声发生器的相位与回波周期完全锁定。它不是单纯的声音遮蔽器。',['noise_chain_hidden','白噪声锁相','白噪声发生器与回波周期锁相，是同步链的一部分。'])"><strong>相位监视器</strong><span>有一个不该同步的波形</span></button>
+    </div>
+    <div id="detailBox"></div>
+    <div class="panel">
+      <h3>频道重放序列</h3>
+      <p>${mapKnown?'你已经在档案室见过“方向 ↔ 频率”对照表。':'你知道方向顺序，但还没有找到方向和频率的映射。可以尝试，也可以先去档案室。'}</p>
+      <div class="freqs">
+        ${['88.4','93.7','101.2','107.9'].map(f=>`<button class="freq" data-f="${f}">${f} MHz</button>`).join('')}
+      </div>
+      <div class="sequence" id="freqSeq">${S.freqSeq.map((x,i)=>`<span class="chip">${i+1}. ${x}</span>`).join('')}</div>
+      <div class="row"><button class="btn ghost" id="freqReset">重置</button><button class="btn primary" id="freqCheck">合成脉冲</button></div>
+      <div class="status" id="radioStatus">${S.solved.radio?'脉冲已合成。信号碎片已取出。':''}</div>
+    </div>
+    ${S.solved.radio?`
+    <div class="callout">
+      <b>合成后的完整语音</b>
+      <p>“坐标二四一，三七。重复：AZ 241，EL 37。许默，如果你听见我，先别回答你是谁。告诉我——你还记不记得雨停过一次？”</p>
+      ${!S.flags.radioReply?`<div class="row" style="margin-top:10px">
+        <button class="btn" id="replyRemember">回答：记得</button>
+        <button class="btn" id="replyNo">回答：不记得</button>
+        <button class="btn ghost" id="replySilent">保持沉默</button>
+      </div>`:`<div class="status ok">你的回答已被发射：${esc(S.flags.radioReply)}</div>`}
+    </div>`:''}`;
+  document.querySelectorAll('.freq').forEach(b=>b.onclick=()=>{
+    if(S.freqSeq.length<4){S.freqSeq.push(b.dataset.f);save();beep(300+S.freqSeq.length*80,.04);renderRadio()}
+  });
+  $('#freqReset').onclick=()=>{S.freqSeq=[];save();renderRadio()};
+  $('#freqCheck').onclick=()=>{
+    const st=$('#radioStatus'),want=['107.9','88.4','93.7','101.2'];
+    const ok=want.every((x,i)=>S.freqSeq[i]===x);
+    if(ok){
+      S.solved.radio=true;addShard('signal');
+      addClue('coords','无线电坐标','合成语音给出观测坐标：AZ 241，EL 37。');
+      success('四个频道相位拼合，一段完整人声出现。',st);setTimeout(renderRadio,250)
+    }else fail('相位互相抵消，只剩白噪声。方向或映射不对。',st)
+  };
+  if($('#replyRemember'))$('#replyRemember').onclick=()=>reply('记得');
+  if($('#replyNo'))$('#replyNo').onclick=()=>reply('不记得');
+  if($('#replySilent'))$('#replySilent').onclick=()=>reply('沉默');
+}
+function reply(v){S.flags.radioReply=v;save();addClue('radio_reply','你的发射回应','你向回波中的声音回答：“'+v+'”。');renderRadio();renderSide()}
+
+function renderObservatory(){
+  const haveCoords=hasClue('coords');
+  main.innerHTML=`
+    <div class="chapter">Optional route · observatory</div>
+    <h2>观测穹顶</h2>
+    <p class="lead">穹顶不是天文台。巨大的相位镜对准云层，把闪电当作天然时间标尺。
+主控台的两个旋钮分别标着 AZ 与 EL，但编码器存在固定偏差。</p>
+    <div class="grid">
+      <button class="object ${S.seen.encoder?'seen':''}" onclick="G.inspect('encoder','编码器校准卡','<div class=&quot;doc&quot;>AZ_true = AZ_dial + 17 (mod 360)\nEL_true = 90 - EL_dial</div>',['encoder_rule','编码器偏差','真方位 = 表盘方位 +17；真仰角 = 90 - 表盘读数。'])"><strong>编码器校准卡</strong><span>两个旋钮都不是所见即所得</span></button>
+      <button class="object ${S.seen.oldObs?'seen':''}" onclick="G.inspect('oldObs','旧观测记录','只有在输入“真实坐标对应的表盘读数”时，相位镜才会锁定。直接输入真实坐标会偏离。')"><strong>旧观测记录</strong><span>提醒不要直接抄坐标</span></button>
+      <button class="object ${S.seen.rainGraph?'seen':''}" onclick="G.inspect('rainGraph','闪电时间图','03:09:33 起，相位镜已经记录到 7 分钟周期的重复闪电；03:17 并不是首次异常。',['phase_start','闪电时间图','回波周期最迟在 03:09:33 已经出现。'])"><strong>闪电时间图</strong><span>异常开始得比 03:17 早</span></button>
+      <button class="object secret ${S.seen.hiddenTape?'seen':''}" onclick="G.inspect('hiddenTape','镜筒里的磁带','磁带上只有一句林夏的声音：<br><b>“如果四枚碎片都在，别用任何一个人做锚。”</b>',['no_anchor','隐藏证据：不要做人类锚点','林夏留下明确警告：四枚碎片齐全时，不要用任何一个人作为回波锚点。',true])"><strong>相位镜镜筒</strong><span>里面有轻微撞击声</span></button>
+    </div>
+    <div id="detailBox"></div>
+
+    <div class="panel">
+      <h3>相位镜坐标</h3>
+      <p>${haveCoords?'无线电语音给出的真实坐标是 AZ 241 / EL 37。控制台要求输入“旋钮实际应设的读数”。':'你还没有可靠的目标坐标。无线电室也许能提供。'}</p>
+      <div class="row">
+        <input id="azInput" type="number" min="0" max="359" placeholder="AZ dial">
+        <input id="elInput" type="number" min="0" max="90" placeholder="EL dial">
+        <button class="btn primary" id="obsBtn">锁定</button>
+      </div>
+      <div class="status" id="obsStatus">${S.solved.observatory?'相位镜已锁定。观测碎片已取出。':''}</div>
+    </div>`;
+  $('#obsBtn').onclick=()=>{
+    const st=$('#obsStatus'),az=+$('#azInput').value,el=+$('#elInput').value;
+    if(az===224&&el===53){
+      S.solved.observatory=true;addShard('observation');
+      addClue('observation_result','相位镜记录','03:09:33 已存在回波；03:17 是第一个完整闭环，不是事故起点。');
+      success('镜面锁定。云层中的闪电轨迹重合成一个闭环。',st)
+    }else fail('相位镜偏离目标。检查“真实坐标”和“表盘读数”的换算。',st)
+  }
+}
+
+function renderCore(){
+  S.flags.openedCore=true;save();
+  if(S.ending){renderEnding();return}
+  if(!S.solved.deduction){renderCoreDeduction();return}
+  renderCoreChoice();
+}
+
+function renderCoreDeduction(){
+  const statements=[
+    ['a','03:17 是第一次异常发生的时间。'],
+    ['b','身份索引的删除发生在回波异常出现之后。'],
+    ['c','白噪声发生器只是用来遮蔽环境噪音。'],
+    ['d','事故在 03:17 之前就已经开始。'],
+    ['e','切断同步链后存在一个短暂的不稳定窗口。'],
+    ['f','林夏的身份删除证明她启动了实验。']
+  ];
+  main.innerHTML=`
+    <div class="chapter">B1 core · reconstruction</div>
+    <h2>核心区：因果审查</h2>
+    <p class="lead">核心没有要求你输入一个密码。它要求你做更危险的事：<b>从证据里选出三个可以同时成立的判断。</b>
+错误答案不会结束游戏，但会增加一次“因果污染”记录。</p>
+    <div class="callout red"><b>规则</b><p>恰好选择 3 项。不要根据“谁像坏人”来选，只看你已经拿到的时间、日志和设备证据。</p></div>
+    <div class="evidence-grid">
+      ${statements.map(s=>`<div class="statement"><input type="checkbox" id="s_${s[0]}" value="${s[0]}"><label for="s_${s[0]}">${s[1]}</label></div>`).join('')}
+    </div>
+    <button class="btn primary" id="deduceBtn" style="margin-top:12px">提交因果模型</button>
+    <div class="status" id="deduceStatus"></div>
+    <div id="detailBox"></div>`;
+  $('#deduceBtn').onclick=()=>{
+    const picks=[...document.querySelectorAll('.statement input:checked')].map(x=>x.value).sort();
+    const st=$('#deduceStatus');
+    if(picks.join('')==='bde'){
+      S.solved.deduction=true;S.flags.finalTheory=true;
+      addClue('causal_model','因果模型','事故早于 03:17；身份删除发生在回波之后；同步链存在短暂断电空窗。');
+      success('模型稳定。核心解锁最终控制台。',st);
+      setTimeout(renderCore,350)
+    }else fail('模型自相矛盾。核心标记了一次“因果污染”，但允许重试。',st)
+  }
+}
+
+function renderCoreChoice(){
+  const full=S.shards.length===4;
+  const allSecrets=S.secrets.length>=4;
+  const trueRoute=full&&allSecrets&&S.solved.deduction;
+  main.innerHTML=`
+    <div class="chapter">B1 core · final control</div>
+    <h2>现在，才轮到你选择</h2>
+    <p class="lead">核心重建出完整时间线的一部分：
+
+03:09，陈博士的校准模板被用于一次未签字启动。
+03:09:33，回波异常出现。
+03:12:44，你删除了林夏的身份索引——不是为了抹掉她，而是试图阻止系统把她固定成“锚”。
+03:17，第一个完整七分钟闭环形成。
+
+你收到的那些“来自未来的录音”，并不全是同一个人发的。</p>
+
+    <div class="callout">
+      <b>当前证据完整度</b>
+      <p>档案碎片：${S.shards.length}/4　·　隐藏证据：${S.secrets.length}/4　·　错误尝试：${S.mistakes}</p>
+    </div>
+
+    <div class="choice-list">
+      <button class="btn choice primary" id="endMemory"><b>方案 A：用自己的近期记忆做锚</b><br><span style="color:#93a2b5;font-size:12px">停止闭环；你会失去与事故相关的记忆。</span></button>
+      <button class="btn choice red" id="endLoop"><b>方案 B：保留现状，维持闭环</b><br><span style="color:#ad9298;font-size:12px">所有人都保留现在的状态，但七分钟循环继续。</span></button>
+      <button class="btn choice" id="endExpose"><b>方案 C：切断实验并保留全部事故日志</b><br><span style="color:#93a2b5;font-size:12px">结束回波，同时把完整责任链交给站外审计。</span></button>
+      ${trueRoute?`<button class="btn choice gold" id="endZero"><b>隐藏方案：制造“无锚空窗”</b><br><span style="color:#d7c394;font-size:12px">四枚碎片与四条隐藏证据允许你在 8 秒自由漂移中同时撤掉两个身份锚。</span></button>`:`<button class="btn choice" disabled><b>隐藏方案：证据不足</b><br><span style="font-size:12px">需要 4/4 碎片 + 4/4 隐藏证据。</span></button>`}
+    </div>`;
+  $('#endMemory').onclick=()=>finish('memory');
+  $('#endLoop').onclick=()=>finish('loop');
+  $('#endExpose').onclick=()=>finish('expose');
+  if($('#endZero'))$('#endZero').onclick=()=>finish('zero');
+}
+
+function finish(type){
+  S.ending=type;save();beep(type==='zero'?980:type==='loop'?190:720,.2);renderEnding();renderSide()
+}
+function renderEnding(){
+  const minutes=S.startedAt?Math.floor((Date.now()-S.startedAt)/60000):0;
+  const ep={
+    memory:{
+      tag:'ENDING A · ANCHOR',
+      title:'你忘记了七分钟',
+      body:`你把自己的记忆写入同步链。
+
+03:17 没有再次发生。林夏从医务间醒来，陈博士的校准程序也被强制停机。代价很简单：你不再记得为什么要救她。
+
+清晨，她把那只写着 X.M. 的杯子推到你面前。
+你问：“我们认识吗？”
+
+她沉默了很久，只说：“从今天开始认识也行。”`
+    },
+    loop:{
+      tag:'ENDING B · CLOSED LOOP',
+      title:'第 44 次雨夜',
+      body:`你拒绝让任何新的东西进入因果链。
+
+核心维持运行，七分钟闭环没有崩溃。灯熄灭，然后重新亮起。
+
+你回到中央大厅。
+桌上还是两只咖啡杯。
+B1 仍然上锁。
+
+不同的是，这一次你清楚记得：
+这是第 44 次。`
+    },
+    expose:{
+      tag:'ENDING C · AUDIT',
+      title:'有人必须留下记录',
+      body:`你切断实验，并把能够恢复的日志全部写入站外审计包。
+
+回波停止。林夏活了下来。
+你也没有失去记忆。
+
+数周后，事故调查启动。未签字的 03:09 校准命令、你的身份删除操作、陈博士的模板、同步链设计缺陷，全都成为证据。
+
+真相没有变得干净。
+但它第一次不需要靠某个人被忘记来维持。`
+    },
+    zero:{
+      tag:'ENDING Ω · ZERO ANCHOR',
+      title:'第八秒之外',
+      body:`你没有选择任何一个人做锚。
+
+四枚碎片同时写入临时缓存。
+白噪声同步链断电。
+
+第一秒，所有时钟停止。
+第四秒，你听见七分钟前的自己在耳机里呼吸。
+第七秒，林夏说：“现在。”
+第八秒，你同时撤掉两个身份锚，并让缓存自毁。
+
+03:17 过去了。
+03:18 到来。
+
+窗外的雨没有重播。
+杯里的咖啡继续变冷。
+没有谁消失，也没有谁需要替另一个人记住这一切。
+
+核心最后留下的一行字是：
+ZERO ANCHOR / CAUSAL CHAIN RELEASED`
+    }
+  }[S.ending];
+
+  main.innerHTML=`
+    <div class="chapter">${ep.tag}</div>
+    <div class="ending"><h3>${ep.title}</h3><p>${ep.body}</p></div>
+    <div class="callout ${S.ending==='zero'?'gold':''}">
+      <b>本轮调查</b>
+      <p>用时约 ${minutes} 分钟 · 碎片 ${S.shards.length}/4 · 隐藏证据 ${S.secrets.length}/4 · 错误尝试 ${S.mistakes}<br>
+      路线选择：档案 ${S.flags.archiveChoice||'未决定'} / 无线电回应 ${S.flags.radioReply||'未回应'}</p>
+    </div>
+    <div class="row"><button class="btn primary" id="restartEnding">重新调查</button><button class="btn ghost" id="backEnding">回到最终选择</button></div>`;
+  $('#restartEnding').onclick=()=>{if(confirm('清空本轮进度并重新开始？'))reset()};
+  $('#backEnding').onclick=()=>{S.ending=null;save();renderCoreChoice()}
+}
+
+const HINTS={
+  atrium:[
+    '这里主要负责告诉你“有哪些路”，不用急着解谜。先任选宿舍、配电间或档案室调查。',
+    '想尽快打开更多区域，优先恢复配电；想拿第一枚碎片，可以先去宿舍。',
+    'B1 只需要任意 3 枚碎片。隐藏结局则要求 4 枚碎片和 4 条隐藏证据。'
+  ],
+  dorm:[
+    '机械箱写着“按形状，不按日期”。每张照片都把一个形状和一个数量绑定。',
+    '便签给了形状顺序：圆 → 方 → 灯罩形状 → 三角。',
+    '照片对应：圆=4，方=1，灯罩是六边形=6，三角=2。密码 4162。'
+  ],
+  generator:[
+    '不要猜“哪些应该开”。把 ON/OFF 当成真假值，逐条满足五个等式/不等式。',
+    '由 A≠B、F≠A 可以推出 B 与 F 相同；又因为 C=F，所以 B=C=E=F。',
+    '唯一状态：A OFF，B ON，C ON，D OFF，E ON，F ON。'
+  ],
+  archive:[
+    '如果终端还锁着，可以从宿舍拿纸质索引，也可以从配电间拿维护令牌绕过。',
+    'ECHO 有 4 个字母，所以 SHIFT=3。凯撒解密要把字母向回移动 3 位。',
+    'FDXVDO 向回移 3 得到 CAUSAL。'
+  ],
+  radio:[
+    '控制台已经给了方向顺序 W→N→E→S；缺的是“方向对应哪个频率”。',
+    '档案室的站点频率表提供 N/E/S/W 与四个 MHz 的映射。',
+    '正确频率顺序：107.9 → 88.4 → 93.7 → 101.2。'
+  ],
+  observatory:[
+    '无线电给的是“真实坐标”，但穹顶要求“表盘读数”。先找到编码器校准公式。',
+    'AZ_true = AZ_dial + 17；EL_true = 90 - EL_dial。',
+    '真实坐标 241 / 37，因此表盘应设 AZ 224，EL 53。'
+  ],
+  core:[
+    '核心要求的是三条能同时被证据直接支持的陈述，而不是人物动机判断。',
+    '时间证据说明异常早于 03:17；删除日志说明身份删除发生在回波后；维护记录说明同步链断电会有空窗。',
+    '选择：身份删除在回波之后 / 事故早于 03:17 / 同步链断电有短暂窗口。'
+  ]
+};
+
+function useHint(){
+  if(!S.started){hintText.textContent='先开始调查。';return}
+  const arr=HINTS[S.room]||['这里没有提示。'];
+  const lv=S.hintLevels[S.room]||0;
+  hintText.textContent=arr[Math.min(lv,arr.length-1)];
+  S.hintLevels[S.room]=Math.min(lv+1,arr.length-1);save();beep(430,.04)
+}
+
+function render(){
+  soundBtn.textContent='声音：'+(S.sound?'开':'关');
+  renderNav();renderSide();
+  if(!S.started){renderStart();return}
+  if(!timerInt)startTimer();
+  const map={
+    atrium:renderAtrium,dorm:renderDorm,generator:renderGenerator,
+    archive:renderArchive,radio:renderRadio,observatory:renderObservatory,core:renderCore
+  };
+  map[S.room]();
+}
+
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{S.sideTab=t.dataset.tab;save();renderSide()});
+hintBtn.onclick=useHint;
+soundBtn.onclick=()=>{S.sound=!S.sound;save();soundBtn.textContent='声音：'+(S.sound?'开':'关');if(S.sound)beep()};
+$('#restartBtn').onclick=()=>{if(confirm('确定清空当前调查进度？'))reset()};
+
+window.G={go,inspect};
+render();
+})();
+</script>
+</body>
+</html>
