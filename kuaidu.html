@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C++ 快速IO模板 · 代码渲染</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 1.5rem;
+    }
+
+    /* 代码卡片容器 */
+    .code-card {
+      background: #1e1e2e;
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+      box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      max-width: 100%;
+      width: fit-content;
+      transition: box-shadow 0.2s;
+    }
+
+    .code-card:hover {
+      box-shadow: 0 25px 40px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.12);
+    }
+
+    /* 顶部栏：语言标签 + 复制按钮 */
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      user-select: none;
+    }
+
+    .lang-badge {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #a6accd;
+      background: #2a2a3c;
+      padding: 0.2rem 0.75rem;
+      border-radius: 20px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      border: 1px solid #3a3a4e;
+    }
+
+    /* 复制按钮样式 */
+    .copy-btn {
+      background: #2a2a3c;
+      border: 1px solid #3a3a4e;
+      color: #cdd6f4;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.45rem 1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      line-height: 1;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    .copy-btn:hover {
+      background: #3a3a52;
+      border-color: #5a5a72;
+      color: #ffffff;
+    }
+
+    .copy-btn:active {
+      background: #1e1e2e;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    .copy-btn.copied {
+      background: #2c5e3a;
+      border-color: #4caf7a;
+      color: #d0f0d8;
+    }
+
+    .copy-btn.copied:hover {
+      background: #2c5e3a;
+      border-color: #4caf7a;
+      color: #d0f0d8;
+    }
+
+    .copy-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* 代码区域 */
+    .code-body {
+      position: relative;
+      border-radius: 10px;
+      background: #181825;
+      padding: 1.2rem 1.4rem;
+      overflow-x: auto;
+    }
+
+    .code-body pre {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      color: #e2e8f0;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      font-weight: 400;
+      letter-spacing: 0.2px;
+      white-space: pre;
+      tab-size: 4;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .code-body code {
+      display: block;
+      font-family: inherit;
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      white-space: pre;
+    }
+
+    /* ===== 语法高亮配色 ===== */
+    .pp {
+      color: #b0b8c4;
+    }
+
+    .header {
+      color: #89ddff;
+    }
+
+    .keyword {
+      color: #c792ea;
+      font-weight: 500;
+    }
+
+    .namespace {
+      color: #ffcb6b;
+    }
+
+    .function {
+      color: #82aaff;
+    }
+
+    .string {
+      color: #c3e88d;
+    }
+
+    .operator {
+      color: #f78c6c;
+    }
+
+    .number {
+      color: #f78c6c;
+    }
+
+    .punctuation {
+      color: #a6accd;
+    }
+
+    .comment {
+      color: #6b7280;
+      font-style: italic;
+    }
+
+    .type {
+      color: #82aaff;
+    }
+
+    .macro {
+      color: #e5c07b;
+    }
+
+    .preprocessor {
+      color: #b0b8c4;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    .copy-btn span {
+      display: inline-block;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="code-card">
+    <div class="code-header">
+      <span class="lang-badge">C++</span>
+      <button class="copy-btn" id="copyButton" aria-label="复制代码">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+          <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+        </svg>
+        <span>复制代码</span>
+      </button>
+    </div>
+
+    <div class="code-body">
+      <pre><code id="codeContent"><span class="pp">#ifdef</span> <span class="macro">int</span>
+<span class="pp">#define</span> <span class="macro">__defined_int_to_long_long</span>
+<span class="pp">#undef</span> <span class="macro">int</span>
+<span class="pp">#endif</span>
+<span class="pp">#ifdef</span> <span class="macro">__linux__</span>
+<span class="pp">#include</span> <span class="header">&lt;sys/stat.h&gt;</span>
+<span class="pp">#include</span> <span class="header">&lt;sys/mman.h&gt;</span>
+<span class="pp">#endif</span>
+<span class="pp">#define</span> <span class="macro">USE_FREAD</span>
+<span class="comment">// #undef USE_FREAD</span>
+<span class="comment">// 取消注释上一行会使用 getchar() 替代 fread，可以不使用 EOF 结束读入，但是降低性能 </span>
+<span class="keyword">namespace</span> <span class="namespace">lib</span><span class="punctuation">{</span>
+<span class="pp">#ifndef</span> <span class="macro">LIB_STRING</span>
+    <span class="keyword">using</span> <span class="type">string</span><span class="operator">=</span><span class="namespace">std</span><span class="punctuation">::</span><span class="type">string</span><span class="punctuation">;</span>
+<span class="pp">#endif</span>
+<span class="pp">#ifdef</span> <span class="macro">USE_FREAD</span>
+    <span class="keyword">template</span> <span class="operator">&lt;</span><span class="keyword">const</span> <span class="keyword">long</span> <span class="keyword">long</span> <span class="macro">MAXSIZE</span><span class="punctuation">,</span> <span class="keyword">const</span> <span class="keyword">long</span> <span class="keyword">long</span> <span class="macro">MAX_ITEM_SZ</span><span class="operator">=</span><span class="number">500</span><span class="operator">&gt;</span>
+<span class="pp">#endif</span>
+    <span class="keyword">struct</span> <span class="type">IO</span> <span class="punctuation">{</span>
+<span class="pp">#ifdef</span> <span class="macro">USE_FREAD</span>
+<span class="pp">#ifdef</span> <span class="macro">__linux__</span>
+        <span class="keyword">struct</span> <span class="type">stat</span> <span class="macro">s</span><span class="punctuation">;</span>
+        <span class="keyword">char</span> <span class="operator">*</span><span class="macro">c</span><span class="punctuation">;</span>
+<span class="pp">#else</span>
+        <span class="keyword">char</span> <span class="macro">buf</span><span class="punctuation">[</span><span class="macro">MAXSIZE</span><span class="punctuation">],</span><span class="operator">*</span><span class="macro">p1</span><span class="punctuation">,</span><span class="operator">*</span><span class="macro">p2</span><span class="punctuation">;</span>
+<span class="pp">#endif</span><span class="comment">// __linux__</span>
+        <span class="keyword">char</span> <span class="macro">pbuf</span><span class="punctuation">[</span><span class="macro">MAXSIZE</span><span class="punctuation">],</span><span class="operator">*</span><span class="macro">pp</span><span class="punctuation">;</span>
+<span class="pp">#ifdef</span> <span class="macro">__linux__</span>
+        <span class="function">IO</span><span class="punctuation">()</span><span class="punctuation">:</span> <span class="macro">pp</span><span class="punctuation">(</span><span class="macro">pbuf</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+            <span class="function">fstat</span><span class="punctuation">(</span><span class="number">0</span><span class="punctuation">,</span> <span class="operator">&amp;</span><span class="macro">s</span><span class="punctuation">);</span>
+            <span class="macro">c</span> <span class="operator">=</span> <span class="punctuation">(</span><span class="keyword">char</span><span class="operator">*</span><span class="punctuation">)</span><span class="function">mmap</span><span class="punctuation">(</span><span class="keyword">nullptr</span><span class="punctuation">,</span> <span class="macro">s</span><span class="punctuation">.</span><span class="macro">st_size</span><span class="punctuation">,</span> <span class="number">1</span><span class="punctuation">,</span> <span class="number">2</span><span class="punctuation">,</span> <span class="number">0</span><span class="punctuation">,</span> <span class="number">0</span><span class="punctuation">);</span>
+        <span class="punctuation">}</span>
+<span class="pp">#else</span> <span class="comment">// not __linux__</span>
+        <span class="function">IO</span><span class="punctuation">()</span><span class="punctuation">:</span> <span class="macro">p1</span><span class="punctuation">(</span><span class="macro">buf</span><span class="punctuation">),</span> <span class="macro">p2</span><span class="punctuation">(</span><span class="macro">buf</span><span class="punctuation">),</span> <span class="macro">pp</span><span class="punctuation">(</span><span class="macro">pbuf</span><span class="punctuation">)</span> <span class="punctuation">{}</span>
+<span class="pp">#endif</span> <span class="comment">// __linux</span>
+        <span class="operator">~</span><span class="function">IO</span><span class="punctuation">()</span> <span class="punctuation">{</span>  <span class="function">fwrite</span><span class="punctuation">(</span><span class="macro">pbuf</span><span class="punctuation">,</span><span class="number">1</span><span class="punctuation">,</span><span class="macro">pp</span><span class="operator">-</span><span class="macro">pbuf</span><span class="punctuation">,</span><span class="macro">stdout</span><span class="punctuation">);</span>  <span class="punctuation">}</span>
+<span class="pp">#ifdef</span> <span class="macro">__linux__</span>
+        <span class="keyword">inline</span> <span class="keyword">char</span> <span class="function">gc</span><span class="punctuation">()</span> <span class="punctuation">{</span> <span class="keyword">return</span> <span class="operator">*</span><span class="macro">c</span><span class="operator">++</span><span class="punctuation">;</span> <span class="punctuation">}</span>
+<span class="pp">#else</span>  <span class="comment">// not __linux__</span>
+        <span class="keyword">inline</span> <span class="keyword">char</span> <span class="function">gc</span><span class="punctuation">()</span> <span class="punctuation">{</span>
+            <span class="keyword">if</span> <span class="punctuation">(</span><span class="macro">p1</span><span class="operator">==</span><span class="macro">p2</span><span class="punctuation">)</span> <span class="macro">p2</span><span class="operator">=</span><span class="punctuation">(</span><span class="macro">p1</span><span class="operator">=</span><span class="macro">buf</span><span class="punctuation">)</span><span class="operator">+</span><span class="function">fread</span><span class="punctuation">(</span><span class="macro">buf</span><span class="punctuation">,</span><span class="number">1</span><span class="punctuation">,</span><span class="macro">MAXSIZE</span><span class="punctuation">,</span><span class="macro">stdin</span><span class="punctuation">);</span>
+            <span class="keyword">return</span> <span class="macro">p1</span><span class="operator">==</span><span class="macro">p2</span><span class="operator">?</span><span class="string">'\0'</span><span class="punctuation">:</span><span class="operator">*</span><span class="macro">p1</span><span class="operator">++</span><span class="punctuation">;</span>
+        <span class="punctuation">}</span>
+<span class="pp">#endif</span> <span class="comment">// __linux__</span>
+        <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">sync</span><span class="punctuation">()</span> <span class="punctuation">{</span> <span class="function">fwrite</span><span class="punctuation">(</span><span class="macro">pbuf</span><span class="punctuation">,</span><span class="number">1</span><span class="punctuation">,</span><span class="macro">MAXSIZE</span><span class="punctuation">,</span><span class="macro">stdout</span><span class="punctuation">);</span> <span class="macro">pp</span><span class="operator">=</span><span class="macro">pbuf</span><span class="punctuation">;</span> <span class="punctuation">}</span>
+<span class="pp">#else</span> <span class="comment">// not USE_FREAD</span>
+        <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">sync</span><span class="punctuation">()</span> <span class="punctuation">{}</span>
+        <span class="keyword">inline</span> <span class="keyword">char</span> <span class="function">gc</span><span class="punctuation">()</span> <span class="punctuation">{</span>  <span class="keyword">return</span> <span class="function">getchar</span><span class="punctuation">();</span>  <span class="punctuation">}</span>
+<span class="pp">#endif</span><span class="comment">// USE_FREAD</span>
+        <span class="keyword">char</span> <span class="macro">floatFormat</span><span class="punctuation">[</span><span class="number">10</span><span class="punctuation">]</span><span class="operator">=</span><span class="string">"%.6f"</span><span class="punctuation">,</span> <span class="macro">doubleFormat</span><span class="punctuation">[</span><span class="number">10</span><span class="punctuation">]</span><span class="operator">=</span><span class="string">"%.6lf"</span><span class="punctuation">;</span>
+        <span class="keyword">inline</span> <span class="keyword">bool</span> <span class="function">blank</span><span class="punctuation">(</span><span class="keyword">char</span> <span class="macro">ch</span><span class="punctuation">)</span> <span class="punctuation">{</span> <span class="keyword">return</span> <span class="macro">ch</span><span class="operator">&lt;=</span><span class="number">32</span> <span class="keyword">or</span> <span class="macro">ch</span><span class="operator">==</span><span class="number">127</span><span class="punctuation">;</span> <span class="punctuation">}</span>
+        <span class="keyword">inline</span> <span class="keyword">bool</span> <span class="function">isd</span><span class="punctuation">(</span><span class="keyword">char</span> <span class="macro">x</span><span class="punctuation">)</span> <span class="punctuation">{</span><span class="keyword">return</span> <span class="punctuation">(</span><span class="macro">x</span><span class="operator">&gt;=</span><span class="string">'0'</span> <span class="keyword">and</span> <span class="macro">x</span><span class="operator">&lt;=</span><span class="string">'9'</span><span class="punctuation">);</span><span class="punctuation">}</span>
+        <span class="keyword">inline</span> <span class="type">IO</span><span class="operator">&amp;</span> <span class="function">setprecision</span><span class="punctuation">(</span><span class="keyword">int</span> <span class="macro">d</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+            <span class="function">sprintf</span><span class="punctuation">(</span><span class="macro">floatFormat</span><span class="punctuation">,</span> <span class="string">"%%.%df"</span><span class="punctuation">,</span> <span class="macro">d</span><span class="punctuation">);</span> <span class="function">sprintf</span><span class="punctuation">(</span><span class="macro">doubleFormat</span><span class="punctuation">,</span> <span class="string">"%%.%dlf"</span><span class="punctuation">,</span> <span class="macro">d</span><span class="punctuation">);</span>
+            <span class="keyword">return</span> <span class="operator">*</span><span class="keyword">this</span><span class="punctuation">;</span>
+        <span class="punctuation">}</span>
+        <span class="type">string</span> <span class="function">input</span><span class="punctuation">(</span><span class="keyword">int</span> <span class="macro">reserve</span><span class="operator">=</span><span class="number">0</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+            <span class="keyword">char</span> <span class="macro">c</span> <span class="operator">=</span> <span class="function">gc</span><span class="punctuation">();</span> <span class="type">string</span> <span class="macro">res</span><span class="operator">=</span><span class="string">""</span><span class="punctuation">;</span> <span class="macro">res</span><span class="punctuation">.</span><span class="function">reserve</span><span class="punctuation">(</span><span class="macro">reserve</span><span class="punctuation">);</span>
+            <span class="keyword">while</span><span class="punctuation">((</span><span class="macro">c</span><span class="operator">&amp;&amp;</span><span class="operator">!</span><span class="function">blank</span><span class="punctuation">(</span><span class="macro">c</span><span class="punctuation">))</span> <span class="keyword">or</span> <span class="macro">c</span><span class="operator">==</span><span class="string">' '</span><span class="punctuation">)</span> <span class="punctuation">{</span>  <span class="macro">res</span><span class="punctuation">.</span><span class="function">push_back</span><span class="punctuation">(</span><span class="macro">c</span><span class="punctuation">);</span> <span class="macro">c</span> <span class="operator">=</span> <span class="function">gc</span><span class="punctuation">();</span> <span class="punctuation">}</span>
+            <span class="keyword">return</span> <span class="macro">res</span><span class="punctuation">;</span>
+        <span class="punctuation">}</span>
+        <span class="keyword">template</span> <span class="operator">&lt;</span><span class="keyword">class</span> <span class="type">T</span><span class="operator">&gt;</span>
+        <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">read</span><span class="punctuation">(</span><span class="type">T</span> <span class="operator">&amp;</span><span class="macro">x</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+            <span class="keyword">double</span> <span class="macro">tmp</span><span class="operator">=</span><span class="number">1</span><span class="punctuation">;</span> <span class="keyword">bool</span> <span class="macro">sign</span><span class="operator">=</span><span class="number">0</span><span class="punctuation">;</span> <span class="macro">x</span><span class="operator">=</span><span class="number">0</span><span class="punctuation">;</span> <span class="keyword">char</span> <span class="macro">ch</span><span class="operator">=</span><span class="function">gc</span><span class="punctuation">();</span>
+            <span class="keyword">for</span> <span class="punctuation">(</span><span class="punctuation">;</span> <span class="keyword">not</span> <span class="function">isd</span><span class="punctuation">(</span><span class="macro">ch</span><span class="punctuation">);</span> <span class="macro">ch</span><span class="operator">=</span><span class="function">gc</span><span class="punctuation">())</span> <span class="keyword">if</span> <span class="punctuation">(</span><span class="macro">ch</span><span class="operator">==</span><span class="string">'-'</span><span class="punctuation">)</span> <span class="macro">sign</span><span class="operator">=</span><span class="number">1</span><span class="punctuation">;</span>
+            <span class="keyword">for</span> <span class="punctuation">(</span><span class="punctuation">;</span> <span class="function">isd</span><span class="punctuation">(</span><span class="macro">ch</span><span class="punctuation">);</span> <span class="macro">ch</span><span class="operator">=</span><span class="function">gc</span><span class="punctuation">())</span> <span class="macro">x</span><span class="operator">=</span><span class="macro">x</span><span class="operator">*</span><span class="number">10</span><span class="operator">+</span><span class="punctuation">(</span><span class="macro">ch</span><span class="operator">^</span><span class="number">48</span><span class="punctuation">);</span>
+            <span class="keyword">if</span> <span class="punctuation">(</span><span class="macro">ch</span><span class="operator">==</span><span class="string">'.'</span><span class="punctuation">)</span> <span class="keyword">for</span> <span class="punctuation">(</span><span class="macro">ch</span><span class="operator">=</span><span class="function">gc</span><span class="punctuation">();</span> <span class="function">isd</span><span class="punctuation">(</span><span class="macro">ch</span><span class="punctuation">);</span> <span class="macro">ch</span><span class="operator">=</span><span class="function">gc</span><span class="punctuation">())</span> <span class="macro">tmp</span><span class="operator">*=</span><span class="punctuation">.</span><span class="number">1f</span><span class="punctuation">,</span><span class="macro">x</span><span class="operator">+=</span><span class="macro">tmp</span><span class="operator">*</span><span class="punctuation">(</span><span class="macro">ch</span><span class="operator">^</span><span class="number">48</span><span class="punctuation">);</span>
+            <span class="keyword">if</span> <span class="punctuation">(</span><span class="macro">sign</span><span class="punctuation">)</span> <span class="macro">x</span><span class="operator">=</span><span class="operator">-</span><span class="macro">x</span><span class="punctuation">;</span>
+        <span class="punctuation">}</span>
+        <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">read</span><span class="punctuation">(</span><span class="keyword">char</span> <span class="operator">*</span><span class="macro">s</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+            <span class="keyword">char</span> <span class="macro">ch</span><span class="operator">=</span><span class="function">gc</span><span class="punctuation">();</span>
+            <span class="keyword">for</span> <span class="punctuation">(</span><span class="punctuation">;</span> <span class="function">blank</span><span class="punctuation">(</span><span class="macro">ch</span><span class="punctuation">);</span> <span class="macro">ch</span><span class="operator">=</span><span class="function">gc</span><span class="punctuation">());</span>
+            <span class="keyword">for</span> <span class="punctuation">(</span><span class="punctuation">;</span> <span class="keyword">not</span> <span class="function">blank</span><span class="punctuation">(</span><span class="macro">ch</span><span class="punctuation">);</span> <span class="macro">ch</span><span class="operator">=</span><span class="function">gc</span><span class="punctuation">())</span> <span class="operator">*</span><span class="macro">s</span><span class="operator">++</span><span class="operator">=</span><span class="macro">ch</span><span class="punctuation">;</span>
+            <span class="operator">*</span><span class="macro">s</span><span class="operator">=</span><span class="number">0</span><span class="punctuation">;</span>
+        <span class="punctuation">}</span>
+        <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">readln</span><span class="punctuation">(</span><span class="keyword">char</span> <span class="operator">*</span><span class="macro">s</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+            <span class="keyword">char</span> <span class="macro">c</span> <span class="operator">=</span> <span class="function">gc</span><span class="punctuation">();</span> <span class="keyword">while</span><span class="punctuation">((</span><span class="macro">c</span><span class="operator">&amp;&amp;</span><span class="operator">!</span><span class="function">blank</span><span class="punctuation">(</span><span class="macro">c</span><span class="punctuation">))</span> <span class="keyword">or</span> <span class="macro">c</span><span class="operator">==</span><span class="string">' '</span><span class="punctuation">)</span> <span class="punctuation">{</span>  <span class="operator">*</span><span class="punctuation">(</span><span class="macro">s</span><span class="operator">++</span><span class="punctuation">)</span><span class="operator">=</span><span class="macro">c</span><span class="punctuation">;</span> <span class="macro">c</span> <span class="operator">=</span> <span class="function">gc</span><span class="punctuation">();</span>  <span class="punctuation">}</span> <span class="operator">*</span><span class="macro">s</span><span class="operator">=</span><span class="number">0</span><span class="punctuation">;</span>
+        <span class="punctuation">}</span>
+        <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">readln</span><span class="punctuation">(</span><span class="type">string</span> <span class="operator">&amp;</span><span class="macro">res</span><span class="punctuation">,</span> <span class="keyword">int</span> <span class="macro">reserve</span><span class="operator">=</span><span class="number">0</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+            <span class="keyword">char</span> <span class="macro">c</span> <span class="operator">=</span> <span class="function">gc</span><span class="punctuation">();</span> <span class="type">string</span><span class="punctuation">().</span><span class="function">swap</span><span class="punctuation">(</span><span class="macro">res</span><span class="punctuation">);</span> <span class="macro">res</span><span class="punctuation">.</span><span class="function">reserve</span><span class="punctuation">(</span><span class="macro">reserve</span><span class="punctuation">);</span>
+            <span class="keyword">while</span><span class="punctuation">((</span><span class="macro">c</span><span class="operator">&amp;&amp;</span><span class="operator">!</span><span class="function">blank</span><span class="punctuation">(</span><span class="macro">c</span><span class="punctuation">))</span> <span class="keyword">or</span> <span class="macro">c</span><span class="operator">==</span><span class="string">' '</span><span class="punctuation">)</span> <span class="punctuation">{</span>  <span class="macro">res</span><span class="punctuation">.</span><span class="function">push_back</span><span class="punctuation">(</span><span class="macro">c</span><span class="punctuation">);</span> <span class="macro">c</span> <span class="operator">=</span> <span class="function">gc</span><span class="punctuation">();</span> <span class="punctuation">}</span>
+        <span class="punctuation">}</span>
+        <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">read</span><span class="punctuation">(</span><span class="keyword">char</span> <span class="operator">&amp;</span><span class="macro">c</span><span class="punctuation">)</span> <span class="punctuation">{</span>  <span class="keyword">for</span> <span class="punctuation">(</span><span class="macro">c</span><span class="operator">=</span><span class="function">gc</span><span class="punctuation">();</span> <span class="function">blank</span><span class="punctuation">(</span><span class="macro">c</span><span class="punctuation">);</span> <span class="macro">c</span><span class="operator">=</span><span class="function">gc</span><span class="punctuation">())</span> <span class="punctuation">{}</span>  <span class="punctuation">}</span>
+        <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">read</span><span class="punctuation">(</span><span class="type">string</span> <span class="operator">&amp;</span><span class="macro">s</span><span class="punctuation">)</span><span class="punctuation">{</span>
+            <span class="type">string</span><span class="punctuation">().</span><span class="function">swap</span><span class="punctuation">(</span><span class="macro">s</span><span class="punctuation">);</span> <span class="keyword">char</span> <span class="macro">ch</span><span class="operator">=</span><span class="function">gc</span><span class="punctuation">();</span>
+            <span class="keyword">for</span> <span class="punctuation">(</span><span class="punctuation">;</span> <span class="function">blank</span><span class="punctuation">(</span><span class="macro">ch</span><span class="punctuation">);</span> <span class="macro">ch</span><span class="operator">=</span><span class="function">gc</span><span class="punctuation">());</span>
+            <span class="keyword">for</span> <span class="punctuation">(</span><span class="punctuation">;</span> <span class="keyword">not</span> <span class="function">blank</span><span class="punctuation">(</span><span class="macro">ch</span><span class="punctuation">);</span> <span class="macro">ch</span><span class="operator">=</span><span class="function">gc</span><span class="punctuation">())</span> <span class="macro">s</span><span class="punctuation">.</span><span class="function">push_back</span><span class="punctuation">(</span><span class="macro">ch</span><span class="punctuation">);</span>
+        <span class="punctuation">}</span>
+        <span class="keyword">template</span> <span class="operator">&lt;</span><span class="keyword">class</span> <span class="type">T</span><span class="punctuation">,</span><span class="keyword">class</span><span class="operator">...</span> <span class="type">Types</span><span class="operator">&gt;</span> <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">read</span><span class="punctuation">(</span><span class="type">T</span> <span class="operator">&amp;</span><span class="macro">x</span><span class="punctuation">,</span><span class="type">Types</span> <span class="operator">&amp;</span><span class="operator">...</span><span class="macro">args</span><span class="punctuation">){</span>  <span class="function">read</span><span class="punctuation">(</span><span class="macro">x</span><span class="punctuation">);</span> <span class="function">read</span><span class="punctuation">(</span><span class="macro">args</span><span class="operator">...</span><span class="punctuation">);</span>  <span class="punctuation">}</span>
+        <span class="keyword">template</span> <span class="operator">&lt;</span><span class="keyword">class</span> <span class="type">T</span><span class="operator">&gt;</span> <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">scan</span><span class="punctuation">(</span><span class="keyword">const</span> <span class="type">T</span> <span class="operator">&amp;</span><span class="macro">x</span><span class="punctuation">)</span> <span class="punctuation">{</span> <span class="function">read</span><span class="punctuation">(</span><span class="operator">*</span><span class="macro">x</span><span class="punctuation">);</span> <span class="punctuation">}</span>
+        <span class="keyword">template</span> <span class="operator">&lt;</span><span class="keyword">class</span> <span class="type">T</span><span class="punctuation">,</span><span class="keyword">class</span> <span class="operator">...</span><span class="type">Types</span><span class="operator">&gt;</span> <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">scan</span><span class="punctuation">(</span><span class="keyword">const</span> <span class="type">T</span> <span class="operator">&amp;</span><span class="macro">x</span><span class="punctuation">,</span><span class="keyword">const</span> <span class="type">Types</span> <span class="operator">&amp;</span><span class="operator">...</span><span class="macro">args</span><span class="punctuation">)</span> <span class="punctuation">{</span>  <span class="function">read</span><span class="punctuation">(</span><span class="operator">*</span><span class="macro">x</span><span class="punctuation">);</span> <span class="function">scan</span><span class="punctuation">(</span><span class="macro">args</span><span class="operator">...</span><span class="punctuation">);</span>  <span class="punctuation">}</span>
+        <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">push</span><span class="punctuation">(</span><span class="keyword">const</span> <span class="keyword">char</span> <span class="operator">&amp;</span><span class="macro">c</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+<span class="pp">#ifdef</span> <span class="macro">USE_FREAD</span>
+            <span class="keyword">if</span> <span class="punctuation">(</span><span class="macro">pp</span><span class="operator">-</span><span class="macro">pbuf</span><span class="operator">==</span><span class="macro">MAXSIZE</span><span class="punctuation">)</span> <span class="function">sync</span><span class="punctuation">();</span>
+            <span class="operator">*</span><span class="macro">pp</span><span class="operator">++</span><span class="operator">=</span><span class="macro">c</span><span class="punctuation">;</span>
+<span class="pp">#else</span>  <span class="comment">// not USE_FREAD</span>
+            <span class="function">putchar</span><span class="punctuation">(</span><span class="macro">c</span><span class="punctuation">);</span>
+<span class="pp">#endif</span>
+        <span class="punctuation">}</span>
+        <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">write</span><span class="punctuation">(</span><span class="keyword">const</span> <span class="keyword">double</span> <span class="macro">x</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+<span class="pp">#ifdef</span> <span class="macro">USE_FREAD</span>
+            <span class="keyword">if</span> <span class="punctuation">(</span><span class="macro">pp</span><span class="operator">-</span><span class="macro">pbuf</span><span class="operator">&gt;=</span><span class="macro">MAXSIZE</span><span class="operator">-</span><span class="macro">MAX_ITEM_SZ</span><span class="punctuation">)</span> <span class="function">sync</span><span class="punctuation">();</span>
+            <span class="macro">pp</span> <span class="operator">+=</span> <span class="function">sprintf</span><span class="punctuation">(</span><span class="macro">pp</span><span class="punctuation">,</span> <span class="macro">doubleFormat</span><span class="punctuation">,</span> <span class="macro">x</span><span class="punctuation">);</span>
+<span class="pp">#endif</span>
+<span class="pp">#ifndef</span> <span class="macro">USE_FREAD</span>
+            <span class="function">printf</span><span class="punctuation">(</span><span class="macro">doubleFormat</span><span class="punctuation">,</span> <span class="macro">x</span><span class="punctuation">);</span>
+<span class="pp">#endif</span>
+        <span class="punctuation">}</span>
+        <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">write</span><span class="punctuation">(</span><span class="keyword">const</span> <span class="keyword">float</span> <span class="macro">x</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+<span class="pp">#ifdef</span> <span class="macro">USE_FREAD</span>
+            <span class="keyword">if</span> <span class="punctuation">(</span><span class="macro">pp</span><span class="operator">-</span><span class="macro">pbuf</span><span class="operator">&gt;=</span><span class="macro">MAXSIZE</span><span class="operator">-</span><span class="macro">MAX_ITEM_SZ</span><span class="punctuation">)</span> <span class="function">sync</span><span class="punctuation">();</span>
+            <span class="macro">pp</span> <span class="operator">+=</span> <span class="function">sprintf</span><span class="punctuation">(</span><span class="macro">pp</span><span class="punctuation">,</span> <span class="macro">floatFormat</span><span class="punctuation">,</span> <span class="macro">x</span><span class="punctuation">);</span>
+<span class="pp">#endif</span>
+<span class="pp">#ifndef</span> <span class="macro">USE_FREAD</span>
+            <span class="function">printf</span><span class="punctuation">(</span><span class="macro">floatFormat</span><span class="punctuation">,</span> <span class="macro">x</span><span class="punctuation">);</span>
+<span class="pp">#endif</span>
+        <span class="punctuation">}</span>
+        <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">write</span><span class="punctuation">(</span><span class="keyword">const</span> <span class="keyword">char</span> <span class="macro">c</span><span class="punctuation">)</span> <span class="punctuation">{</span>  <span class="function">push</span><span class="punctuation">(</span><span class="macro">c</span><span class="punctuation">);</span>  <span class="punctuation">}</span>
+        <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">write</span><span class="punctuation">(</span><span class="keyword">const</span> <span class="type">string</span> <span class="operator">&amp;</span><span class="macro">s</span><span class="punctuation">){</span>  <span class="keyword">for</span> <span class="punctuation">(</span><span class="keyword">auto</span> <span class="macro">i</span><span class="punctuation">:</span><span class="macro">s</span><span class="punctuation">)</span>  <span class="function">push</span><span class="punctuation">(</span><span class="macro">i</span><span class="punctuation">);</span>  <span class="punctuation">}</span>
+        <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">write</span><span class="punctuation">(</span><span class="keyword">const</span> <span class="keyword">char</span> <span class="operator">*</span><span class="macro">s</span><span class="punctuation">){</span>  <span class="keyword">for</span> <span class="punctuation">(</span><span class="punctuation">;</span> <span class="operator">*</span><span class="macro">s</span><span class="punctuation">;</span> <span class="operator">++</span><span class="macro">s</span><span class="punctuation">)</span> <span class="function">push</span><span class="punctuation">(</span><span class="operator">*</span><span class="macro">s</span><span class="punctuation">);</span>  <span class="punctuation">}</span>
+        <span class="keyword">template</span> <span class="operator">&lt;</span><span class="keyword">class</span> <span class="type">T</span><span class="operator">&gt;</span>
+        <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">write</span><span class="punctuation">(</span><span class="type">T</span> <span class="macro">x</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+            <span class="keyword">static</span> <span class="keyword">char</span> <span class="macro">sta</span><span class="punctuation">[</span><span class="number">40</span><span class="punctuation">];</span> <span class="keyword">int</span> <span class="macro">top</span><span class="operator">=</span><span class="number">0</span><span class="punctuation">;</span>
+            <span class="keyword">if</span> <span class="punctuation">(</span><span class="macro">x</span><span class="operator">&lt;</span><span class="number">0</span><span class="punctuation">)</span> <span class="punctuation">{</span>
+                <span class="function">push</span><span class="punctuation">(</span><span class="string">'-'</span><span class="punctuation">),</span><span class="macro">sta</span><span class="punctuation">[</span><span class="macro">top</span><span class="operator">++</span><span class="punctuation">]</span><span class="operator">=</span><span class="punctuation">(</span><span class="operator">-</span><span class="punctuation">(</span><span class="macro">x</span><span class="operator">%</span><span class="number">10</span><span class="punctuation">))</span><span class="operator">^</span><span class="number">48</span><span class="punctuation">,</span><span class="macro">x</span><span class="operator">=</span><span class="operator">-</span><span class="punctuation">(</span><span class="macro">x</span><span class="operator">/</span><span class="number">10</span><span class="punctuation">);</span>
+                <span class="keyword">if</span> <span class="punctuation">(</span><span class="macro">x</span><span class="operator">==</span><span class="number">0</span><span class="punctuation">)</span> <span class="punctuation">{</span> <span class="function">push</span><span class="punctuation">(</span><span class="macro">sta</span><span class="punctuation">[</span><span class="operator">--</span><span class="macro">top</span><span class="punctuation">]);</span> <span class="keyword">return</span><span class="punctuation">;</span> <span class="punctuation">}</span>
+            <span class="punctuation">}</span>
+            <span class="keyword">do</span> <span class="punctuation">{</span>  <span class="macro">sta</span><span class="punctuation">[</span><span class="macro">top</span><span class="operator">++</span><span class="punctuation">]</span><span class="operator">=</span><span class="macro">x</span><span class="operator">%</span><span class="number">10</span><span class="operator">^</span><span class="number">48</span><span class="punctuation">,</span><span class="macro">x</span><span class="operator">/=</span><span class="number">10</span><span class="punctuation">;</span>  <span class="punctuation">}</span> <span class="keyword">while</span> <span class="punctuation">(</span><span class="macro">x</span><span class="punctuation">);</span>
+            <span class="keyword">while</span> <span class="punctuation">(</span><span class="macro">top</span><span class="punctuation">)</span> <span class="function">push</span><span class="punctuation">(</span><span class="macro">sta</span><span class="punctuation">[</span><span class="operator">--</span><span class="macro">top</span><span class="punctuation">]);</span>
+        <span class="punctuation">}</span>
+        <span class="keyword">template</span> <span class="operator">&lt;</span><span class="keyword">class</span> <span class="type">T</span><span class="punctuation">,</span><span class="keyword">class</span><span class="operator">...</span> <span class="type">Types</span><span class="operator">&gt;</span>  <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">write</span><span class="punctuation">(</span><span class="keyword">const</span> <span class="type">T</span> <span class="operator">&amp;</span><span class="macro">x</span><span class="punctuation">,</span><span class="keyword">const</span> <span class="type">Types</span> <span class="operator">&amp;</span><span class="operator">...</span><span class="macro">args</span><span class="punctuation">){</span> <span class="function">write</span><span class="punctuation">(</span><span class="macro">x</span><span class="punctuation">);</span> <span class="function">write</span><span class="punctuation">(</span><span class="string">' '</span><span class="punctuation">);</span> <span class="function">write</span><span class="punctuation">(</span><span class="macro">args</span><span class="operator">...</span><span class="punctuation">);</span> <span class="punctuation">}</span>
+        <span class="keyword">template</span> <span class="operator">&lt;</span><span class="keyword">class</span><span class="operator">...</span> <span class="type">Types</span><span class="operator">&gt;</span> <span class="keyword">inline</span> <span class="keyword">void</span> <span class="function">writeln</span><span class="punctuation">(</span><span class="keyword">const</span> <span class="type">Types</span> <span class="operator">&amp;</span><span class="operator">...</span><span class="macro">args</span><span class="punctuation">){</span>  <span class="function">write</span><span class="punctuation">(</span><span class="macro">args</span><span class="operator">...</span><span class="punctuation">);</span> <span class="function">write</span><span class="punctuation">(</span><span class="string">'\n'</span><span class="punctuation">);</span>  <span class="punctuation">}</span>
+        <span class="keyword">template</span><span class="operator">&lt;</span><span class="keyword">class</span> <span class="type">T</span><span class="operator">=</span><span class="keyword">int</span><span class="operator">&gt;</span> <span class="keyword">inline</span> <span class="type">T</span> <span class="function">get</span><span class="punctuation">()</span> <span class="punctuation">{</span>  <span class="type">T</span> <span class="macro">x</span><span class="punctuation">;</span> <span class="function">read</span><span class="punctuation">(</span><span class="macro">x</span><span class="punctuation">);</span> <span class="keyword">return</span> <span class="macro">x</span><span class="punctuation">;</span>  <span class="punctuation">}</span>
+        <span class="comment">// 流式输入输出</span>
+        <span class="keyword">template</span> <span class="operator">&lt;</span><span class="keyword">class</span> <span class="type">T</span><span class="operator">&gt;</span> <span class="keyword">inline</span> <span class="type">IO</span><span class="operator">&amp;</span> <span class="keyword">operator</span><span class="operator">&gt;&gt;</span><span class="punctuation">(</span><span class="type">T</span><span class="operator">&amp;</span><span class="macro">x</span><span class="punctuation">)</span> <span class="punctuation">{</span>  <span class="function">read</span><span class="punctuation">(</span><span class="macro">x</span><span class="punctuation">);</span> <span class="keyword">return</span> <span class="operator">*</span><span class="keyword">this</span><span class="punctuation">;</span> <span class="punctuation">}</span>
+        <span class="keyword">template</span> <span class="operator">&lt;</span><span class="keyword">class</span> <span class="type">T</span><span class="operator">&gt;</span> <span class="keyword">inline</span> <span class="type">IO</span><span class="operator">&amp;</span> <span class="keyword">operator</span><span class="operator">&lt;&lt;</span><span class="punctuation">(</span><span class="keyword">const</span> <span class="type">T</span><span class="operator">&amp;</span><span class="macro">x</span><span class="punctuation">)</span> <span class="punctuation">{</span>  <span class="function">write</span><span class="punctuation">(</span><span class="macro">x</span><span class="punctuation">);</span> <span class="keyword">return</span> <span class="operator">*</span><span class="keyword">this</span><span class="punctuation">;</span> <span class="punctuation">}</span>
+    <span class="punctuation">};</span>
+    <span class="type">IO</span>
+<span class="pp">#ifdef</span> <span class="macro">USE_FREAD</span>
+    <span class="operator">&lt;</span><span class="number">1048576</span><span class="operator">&gt;</span>
+<span class="pp">#endif</span>
+    <span class="macro">io</span><span class="punctuation">;</span>
+<span class="punctuation">}</span>
+
+<span class="pp">#ifdef</span> <span class="macro">__defined_int_to_long_long</span>
+<span class="pp">#undef</span> <span class="macro">__defined_int_to_long_long</span>
+<span class="pp">#define</span> <span class="macro">int</span> <span class="keyword">long</span> <span class="keyword">long</span>
+<span class="pp">#endif</span>
+<span class="keyword">using</span> <span class="keyword">namespace</span> <span class="namespace">lib</span><span class="punctuation">;</span></code></pre>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      const copyButton = document.getElementById('copyButton');
+      const codeElement = document.getElementById('codeContent');
+
+      // 复制功能核心
+      async function copyCodeToClipboard() {
+        const codeText = codeElement.textContent;
+
+        try {
+          await navigator.clipboard.writeText(codeText);
+          return true;
+        } catch (err) {
+          console.warn('Clipboard API 失败，尝试降级方案:', err);
+          try {
+            const textarea = document.createElement('textarea');
+            textarea.value = codeText;
+            textarea.setAttribute('readonly', '');
+            textarea.style.position = 'fixed';
+            textarea.style.top = '-9999px';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            
+            textarea.select();
+            textarea.setSelectionRange(0, textarea.value.length);
+            const success = document.execCommand('copy');
+            document.body.removeChild(textarea);
+            
+            if (!success) {
+              throw new Error('execCommand 复制失败');
+            }
+            return true;
+          } catch (fallbackErr) {
+            console.error('复制失败:', fallbackErr);
+            return false;
+          }
+        }
+      }
+
+      // 更新按钮状态
+      function showCopyFeedback(success) {
+        const originalHTML = copyButton.innerHTML;
+        const originalAriaLabel = copyButton.getAttribute('aria-label');
+
+        if (success) {
+          copyButton.classList.add('copied');
+          copyButton.innerHTML = `
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+            </svg>
+            <span>已复制!</span>
+          `;
+          copyButton.setAttribute('aria-label', '已复制到剪贴板');
+        } else {
+          copyButton.classList.add('copied');
+          copyButton.style.backgroundColor = '#5e2c2c';
+          copyButton.style.borderColor = '#af4c4c';
+          copyButton.innerHTML = `
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            <span>复制失败</span>
+          `;
+          copyButton.setAttribute('aria-label', '复制失败，请手动复制');
+        }
+
+        setTimeout(() => {
+          copyButton.classList.remove('copied');
+          copyButton.style.backgroundColor = '';
+          copyButton.style.borderColor = '';
+          copyButton.innerHTML = originalHTML;
+          copyButton.setAttribute('aria-label', originalAriaLabel || '复制代码');
+        }, 2000);
+      }
+
+      copyButton.addEventListener('click', async () => {
+        copyButton.disabled = true;
+        setTimeout(() => { copyButton.disabled = false; }, 300);
+
+        const success = await copyCodeToClipboard();
+        showCopyFeedback(success);
+      });
+
+    })();
+  </script>
+</body>
+</html>
