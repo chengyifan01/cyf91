@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f6f7f2">
+<meta name="description" content="timeDLE 时刻收藏家：输入一个时间，发现数字之间的巧合，收集属于这一分钟的徽章。">
+<title>timeDLE · 时刻收藏家</title>
+<style>
+:root{--paper:#f6f7f2;--white:#fff;--ink:#233d35;--muted:#7d8881;--line:#e4e9df;--mint:#deebce;--green:#376044;--soft:#eef2e9;--accent:#8573ad;--radius:24px}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:14px;line-height:1.6}button,input{font:inherit}button{cursor:pointer;color:inherit}button:disabled{cursor:wait;opacity:.65}button,input,a{-webkit-tap-highlight-color:transparent}button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #a2bb8e;outline-offset:4px}button{border:0}a{color:inherit}svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}button svg{flex-shrink:0}.wrap{max-width:1180px;padding:0 32px;margin:auto}
+header{height:96px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-size:24px;letter-spacing:-1px;font-weight:750}.brand-icon{width:34px;height:34px;background:var(--green);border-radius:11px;color:#eaf2df;display:grid;place-items:center}.brand-icon svg{width:23px;height:23px}.brand span span{font-weight:400;color:#7c927c}.nav{display:flex;gap:24px;align-items:center}.nav button{background:none;padding:8px 0;color:var(--muted);font-size:13px}.nav button:hover{color:var(--green)}.nav .active{color:var(--ink)}.small-mark{font-size:11px;color:var(--muted);border-left:1px solid var(--line);padding-left:24px;letter-spacing:1px}
+.intro{padding:48px 0 30px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px}.eyebrow{font-size:10px;letter-spacing:2px;color:#7f9275;display:flex;align-items:center;gap:8px;font-weight:650}.dot{width:6px;height:6px;border-radius:50%;background:#7eaa68;display:inline-block}h1{font-size:clamp(27px,3vw,38px);font-weight:600;letter-spacing:-1.3px;line-height:1.4;margin:12px 0 9px}h1 em{font-style:normal;color:#849f6b}.intro p{margin:0;color:var(--muted);font-size:13px}.intro-note{text-align:right;color:#8a938b;font-size:11px;padding-bottom:4px;line-height:1.9}.intro-note strong{font-size:25px;font-weight:400;color:#abb6a2;font-family:Georgia,serif}
+.workspace{display:grid;grid-template-columns:minmax(0,1.13fr) minmax(0,1fr);gap:22px;align-items:start}.card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius)}.clock-card{padding:27px 30px 25px;overflow:hidden;background:linear-gradient(145deg,#e9f0dd,#e1ecd4 65%,#d7e5c9);border-color:#dce6cf;position:relative}.card-top{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px}.card-top .label{display:flex;align-items:center;gap:8px;font-weight:600}.chip{font-size:10px;border:1px solid #c9d9bc;padding:3px 9px;border-radius:30px;color:#788d67}.clock-form{position:relative;margin:34px 0 0}.time-inputs{display:flex;align-items:center;justify-content:center;gap:10px}.time-inputs input{appearance:textfield;-moz-appearance:textfield;width:40%;max-width:164px;min-width:0;background:#f7faef80;border:1px solid #f9fcf4;border-radius:19px;text-align:center;font-size:clamp(64px,7vw,91px);font-weight:450;letter-spacing:-5px;line-height:1.3;padding:9px 4px 13px;color:var(--ink);font-family:ui-monospace,"SFMono-Regular",Consolas,monospace;box-shadow:0 4px 15px #65844805}.time-inputs input::-webkit-inner-spin-button{appearance:none}.colon{font-family:Georgia,serif;font-size:65px;font-weight:400;color:#76906a;transform:translateY(-7px)}.time-labels{display:flex;justify-content:center;gap:50px;text-align:center;color:#849475;font-size:10px;letter-spacing:2px;margin:9px 0 23px}.time-labels span{width:120px}.error{color:#a0473b;font-size:12px;min-height:22px;text-align:center;margin-top:-12px;margin-bottom:4px}.primary{background:var(--green);color:#f3f7ec;border-radius:12px;padding:13px 18px;width:100%;display:flex;align-items:center;justify-content:center;gap:9px;font-weight:550;transition:background .2s,transform .2s}.primary:hover{background:#294e35;transform:translateY(-1px)}.secondary-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.secondary-actions button{background:#f5f8ee9c;border:1px solid #d0ddc4;border-radius:11px;padding:11px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px}.secondary-actions button:hover{background:#fbfdf6}.clock-bottom{margin-top:23px;padding-top:16px;border-top:1px solid #ceddc1;display:flex;justify-content:space-between;gap:10px;align-items:center;color:#7e9071;font-size:10px}.clock-bottom span{display:flex;align-items:center;gap:6px}.clock-bottom svg{width:13px;height:13px}
+.settings{display:flex;align-items:center;justify-content:space-between;padding:16px 5px 0;gap:10px}.switch-label{display:flex;gap:8px;align-items:center;font-size:11px;color:var(--muted);cursor:pointer}.switch-label input{appearance:none;width:27px;height:16px;border-radius:20px;background:#d7ded3;margin:0;position:relative;cursor:pointer;transition:background .2s}.switch-label input:before{content:"";position:absolute;width:10px;height:10px;border-radius:50%;background:white;top:3px;left:3px;transition:transform .2s}.switch-label input:checked{background:#7e9c6a}.switch-label input:checked:before{transform:translateX(11px)}.kbd-note{font-size:10px;color:#929b91}kbd{font:inherit;border:1px solid #dce2d7;border-bottom-width:2px;border-radius:4px;padding:1px 4px;background:#fff}
+.result-card{padding:26px 27px 22px;min-height:491px}.result-header{display:flex;justify-content:space-between;align-items:center}.section-label{font-size:11px;letter-spacing:1px;font-weight:550;color:#798577}.result-time{font-size:11px;font-family:ui-monospace,monospace;color:#929b91}.result-summary{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:20px 0 19px}.score-label{font-size:10px;color:var(--muted)}.score{font-size:clamp(32px,4vw,44px);font-weight:500;line-height:1.3;letter-spacing:-1.6px;font-variant-numeric:tabular-nums}.rarity{--tone:#82709f;--tint:#f2edf8;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:91px;min-height:87px;border-radius:18px;background:var(--tint);color:var(--tone);padding:12px 9px}.rarity svg{width:27px;height:27px;margin-bottom:5px}.rarity b{font-size:10px;letter-spacing:1px}.rarity small{font-size:9px;opacity:.75;margin-top:2px}.neutral .rarity,.neutral .badge-icon{color:#6b776b!important;background:#eef1eb!important}.rank-row{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:10px}.rank-row strong{font-weight:550;color:#65805a}.rank-track{height:5px;border-radius:5px;background:#edf1e8;margin-top:8px;overflow:hidden}.rank-fill{height:100%;background:#a5be8d;border-radius:5px;transition:width .6s}.badges-heading{display:flex;justify-content:space-between;align-items:center;margin:22px 0 11px;font-size:11px}.badge-count{font-size:10px;color:#8c9788}.badge-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:208px;overflow:auto;padding:1px 4px 2px 1px;scrollbar-width:thin;scrollbar-color:#d9e1d3 transparent}.badge{display:flex;align-items:center;gap:9px;border:1px solid #e8ece3;border-radius:11px;padding:10px 9px;min-width:0;animation:appear .3s both}.badge-icon{width:30px;height:30px;flex-shrink:0;display:grid;place-items:center;background:#f1f4ec;color:#82936c;border-radius:9px;font-family:Georgia,serif;font-size:17px}.badge.special .badge-icon{background:#f4edf9;color:#9b79af}.badge-copy{min-width:0}.badge-name{font-size:11px;font-weight:550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.badge-code{color:#9aa292;font-size:9px;font-family:ui-monospace,monospace}.badge-points{margin-left:auto;font-size:10px;color:#718565;font-family:ui-monospace,monospace;white-space:nowrap}.result-foot{font-size:10px;color:#99a190;margin-top:16px;display:flex;align-items:center;gap:6px}.result-foot svg{width:13px;height:13px}
+.history-section{margin:30px 0 30px}.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.section-head h2{margin:0;display:flex;gap:8px;align-items:center;font-size:13px;font-weight:550}.section-head h2 svg{width:16px;height:16px;color:#83937a}.text-button{background:transparent;color:#8e9789;padding:4px;font-size:10px}.text-button:hover{color:var(--green)}.history-list{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.history-item{text-align:left;background:#fff;border:1px solid var(--line);border-radius:15px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:5px;transition:border-color .2s,transform .2s}.history-item:hover{border-color:#aabd99;transform:translateY(-2px)}.history-item strong{font-size:23px;font-weight:450;letter-spacing:-.5px;font-family:ui-monospace,monospace}.history-item small{display:block;font-size:9px;color:#9aa190}.history-rarity{font-size:9px;border-radius:20px;padding:4px 7px;color:var(--tone);background:var(--tint);letter-spacing:.3px}.empty{grid-column:1/-1;text-align:center;padding:20px;color:#9aa291;font-size:12px;border:1px dashed #d9e1d2;border-radius:14px}.closing{display:flex;align-items:center;gap:22px;color:#9ca58f;margin:25px 0 21px;font-size:11px;text-align:center}.closing:before,.closing:after{content:"";height:1px;background:var(--line);flex:1}.closing span{white-space:nowrap}footer{display:flex;justify-content:space-between;gap:15px;padding:0 0 26px;color:#9aa191;font-size:9px;letter-spacing:.4px}footer b{font-weight:500;color:#7e8c73}
+dialog{border:1px solid var(--line);border-radius:24px;padding:0;color:var(--ink);width:min(640px,calc(100% - 32px));max-height:85vh;background:var(--paper);box-shadow:0 20px 100px #243c3520}dialog::backdrop{background:#243c3545;backdrop-filter:blur(5px)}.modal-head{padding:24px 26px 17px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--paper);z-index:1}.modal-head h2{margin:0;font-size:20px;font-weight:550}.close{width:30px;height:30px;border-radius:50%;background:#e8eee0;font-size:20px}.modal-body{padding:22px 26px}.modal-body p{font-size:13px;color:#788772}.atlas{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px}.atlas-item{padding:11px;border:1px solid var(--line);background:white;border-radius:12px}.atlas-item strong{font-size:12px;font-weight:550}.atlas-item span{float:right;font-size:10px;color:#7a9267}.atlas-item p{font-size:10px;margin:3px 0 0;color:#8b9683;line-height:1.7}.guide-step{padding:15px 0;border-bottom:1px solid var(--line)}.guide-step b{font-size:13px;font-weight:550}.guide-step p{margin:6px 0 0;font-size:12px}.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}.tier-info{padding:10px;border-radius:10px;background:var(--tint);color:var(--tone);font-size:10px}.tier-info b{display:block}.tier-info span{opacity:.85;font-size:9px}.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,15px);opacity:0;pointer-events:none;background:#2f4d3e;color:white;border-radius:12px;padding:10px 18px;box-shadow:0 5px 25px #233d3520;z-index:5;font-size:12px;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}
+@keyframes appear{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}@media(min-width:1100px){.intro{padding-top:44px}.clock-card{min-height:443px}.clock-form{margin-top:39px}.time-labels{margin-bottom:25px}.clock-bottom{margin-top:27px}}
+@media(max-width:800px){.wrap{padding:0 22px}header{height:78px}.intro{padding-top:31px}.intro-note{display:none}.workspace{gap:16px}.clock-card{padding:23px 20px}.time-inputs{gap:6px}.time-inputs input{font-size:65px;letter-spacing:-4px}.colon{font-size:48px}.result-card{padding:23px 18px;min-height:466px}.badge-list{grid-template-columns:1fr;max-height:218px}.badge{padding:7px 9px}.badge-points{font-size:11px}.settings{flex-wrap:wrap}.kbd-note{display:none}.nav{gap:20px}.small-mark{display:none}.history-list{gap:9px}.history-item{padding:12px}.history-item strong{font-size:19px}.history-rarity{font-size:8px;padding:3px 5px}}
+@media(max-width:580px){.wrap{padding:0 18px}header{height:73px}.brand{font-size:22px}.brand-icon{width:30px;height:30px}.nav{gap:17px}.nav button{font-size:11px}.nav .active{display:none}.intro{padding:29px 0 24px}h1{font-size:29px;line-height:1.45;letter-spacing:-1px}.intro p{font-size:12px}.workspace{grid-template-columns:1fr;gap:23px}.clock-card{padding:22px}.clock-form{margin-top:23px}.time-inputs input{font-size:82px;padding:5px 4px 10px}.time-labels{margin-bottom:18px}.time-labels span{width:115px}.clock-bottom{margin-top:18px}.settings{padding:13px 6px 0}.result-card{min-height:0;padding:22px}.result-summary{margin:16px 0}.score{font-size:42px}.badge-list{grid-template-columns:1fr 1fr;max-height:248px}.badge{padding:9px 7px;gap:6px}.badge-icon{width:25px;height:29px}.badge-name{font-size:10px}.badge-points{font-size:9px}.result-foot{margin-top:13px}.history-section{margin-top:24px}.history-list{grid-template-columns:1fr 1fr}.history-item{padding:12px 14px}.history-item strong{font-size:24px}.history-rarity{font-size:9px}.closing{font-size:10px;gap:12px}footer{font-size:8px}.modal-body{padding:18px}.modal-head{padding:20px}.atlas{gap:7px}.atlas-item{padding:9px}.atlas-item strong{font-size:11px}.atlas-item span{font-size:9px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true"><defs>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 2.7 6.3L21 12l-6.3 2.7L12 21l-2.7-6.3L3 12l6.3-2.7Z"/><path d="m20 2 .5 1.5L22 4l-1.5.5L20 6l-.5-1.5L18 4l1.5-.5Z"/></symbol>
+<symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M3 7h3c5 0 6 10 11 10h4m-4-4 4 4-4 4M3 17h3c2 0 3-1 4-3m4-4c1-2 2-3 4-3h3m-4-4 4 4-4 4"/></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></symbol>
+<symbol id="i-history" viewBox="0 0 24 24"><path d="M3 10a9 9 0 1 1 1.6 7M3 4v6h6m3-3v5l3 2"/></symbol>
+<symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19C-1 7 11 3 20 4c0 10-4 17-13 13m-3 4L16 9"/></symbol>
+</defs></svg>
+<div class="wrap">
+<header>
+  <a class="brand" href="#" aria-label="timeDLE 首页">
+    <span class="brand-icon"><svg><use href="#i-clock"/></svg></span>
+    <span>time<span>DLE</span><span style="font-size:10px;letter-spacing:0;margin-left:8px;color:#8f9a84">时刻收藏家</span></span>
+  </a>
+  <nav class="nav" aria-label="主导航">
+    <button class="active" id="exploreNav">探索</button>
+    <button id="atlasOpen">徽章图鉴</button>
+    <button id="helpOpen">玩法</button>
+    <span class="small-mark">A LITTLE TIME, A LITTLE MAGIC.</span>
+  </nav>
+</header>
+<main>
+<section class="intro">
+  <div>
+    <div class="eyebrow"><span class="dot"></span> MAKE EVERY MINUTE A DISCOVERY</div>
+    <h1>每一分钟，都藏着一点<em>特别。</em></h1>
+    <p>输入一个时间，找找数字里的小巧合，收下这一刻的惊喜。</p>
+  </div>
+  <div class="intro-note"><strong>24 × 60</strong><br>平凡的一天，无数种不平凡。</div>
+</section>
+<div class="workspace">
+<section aria-label="选择时间">
+  <div class="card clock-card">
+    <div class="card-top">
+      <span class="label"><svg><use href="#i-clock"/></svg> 选择你的时刻</span>
+      <span class="chip">24 小时制</span>
+    </div>
+    <form id="timeForm" class="clock-form" novalidate>
+      <div class="time-inputs">
+        <input id="hours" aria-label="小时，00 到 23" type="text" inputmode="numeric" maxlength="2" value="12" autocomplete="off" spellcheck="false" aria-describedby="timeError">
+        <span class="colon" aria-hidden="true">:</span>
+        <input id="minutes" aria-label="分钟，00 到 59" type="text" inputmode="numeric" maxlength="2" value="34" autocomplete="off" spellcheck="false" aria-describedby="timeError">
+      </div>
+      <div class="time-labels" aria-hidden="true"><span>HOURS · 时</span><span>MINUTES · 分</span></div>
+      <div class="error" id="timeError" role="alert"></div>
+      <button class="primary" id="discover" type="submit">
+        <svg><use href="#i-spark"/></svg><span>发现这一刻</span><svg><use href="#i-arrow"/></svg>
+      </button>
+    </form>
+    <div class="secondary-actions">
+      <button id="randomButton"><svg><use href="#i-shuffle"/></svg>随机遇见</button>
+      <button id="nowButton"><svg><use href="#i-clock"/></svg>此时此刻</button>
+    </div>
+    <div class="clock-bottom">
+      <span><svg><use href="#i-leaf"/></svg>慢一点，好时刻就在眼前。</span>
+      <span id="deviceTime">跟随设备当地时间</span>
+    </div>
+  </div>
+  <div class="settings">
+    <label class="switch-label"><input type="checkbox" id="instant">立即揭晓</label>
+    <label class="switch-label"><input type="checkbox" id="colorful" checked>彩色徽章</label>
+    <span class="kbd-note"><kbd>Enter</kbd> 发现时刻</span>
+  </div>
+</section>
+<section class="card result-card" aria-label="时间评分结果" aria-busy="false">
+  <div class="result-header"><span class="section-label">这一刻的独特之处</span><span class="result-time" id="resultTime">12:34</span></div>
+  <div class="result-summary">
+    <div><div class="score-label" id="scoreLabel">时刻得分</div><div class="score" id="score">—</div></div>
+    <div class="rarity" id="rarity"><svg><use href="#i-spark"/></svg><b id="tierName">MYTHIC</b><small id="tierChinese">神话时刻</small></div>
+  </div>
+  <div class="rank-row"><span id="rankText">正在寻找这一刻的特别</span><strong id="rankPosition"></strong></div>
+  <div class="rank-track"><div class="rank-fill" id="rankFill" style="width:0%"></div></div>
+  <div class="badges-heading"><span>时刻徽章</span><span class="badge-count" id="badgeCount"></span></div>
+  <div class="badge-list" id="badgeList"></div>
+  <div class="result-foot"><svg><use href="#i-spark"/></svg><span id="resultHint">所有相遇的巧合，都会为这一刻加分。</span></div>
+  <div id="announcement" class="sr-only" role="status" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)"></div>
+</section>
+</div>
+<section class="history-section">
+  <div class="section-head">
+    <h2><svg><use href="#i-history"/></svg>最近遇见的时刻</h2>
+    <button class="text-button" id="clearHistory">清空记录</button>
+  </div>
+  <div class="history-list" id="historyList"></div>
+</section>
+<div class="closing"><span>不必追赶时间，偶尔也收藏它。</span></div>
+</main>
+<footer><span><b>timeDLE</b> · 把时间过成小小的发现</span><span>原作规则保留 · 每一分钟皆有可能</span></footer>
+</div>
+
+<dialog id="atlasDialog" aria-labelledby="atlasTitle">
+  <div class="modal-head"><h2 id="atlasTitle">时刻徽章图鉴</h2><button class="close" aria-label="关闭图鉴" data-close>×</button></div>
+  <div class="modal-body">
+    <p>数字的巧合、整点的仪式感，还有那些熟悉的特殊时刻。每个符合条件的徽章都会叠加计分。</p>
+    <div class="atlas" id="atlasList"></div>
+  </div>
+</dialog>
+<dialog id="helpDialog" aria-labelledby="helpTitle">
+  <div class="modal-head"><h2 id="helpTitle">给时间一点想象</h2><button class="close" aria-label="关闭玩法" data-close>×</button></div>
+  <div class="modal-body">
+    <div class="guide-step"><b>01 / 选一个时刻</b><p>输入小时和分钟，点击「发现这一刻」。也可以随机遇见，或使用设备当前的当地时间。</p></div>
+    <div class="guide-step"><b>02 / 揭晓所有巧合</b><p>徽章按原作顺序逐个出现，分数可以叠加。开启「立即揭晓」可跳过等待，依然展示全部徽章。</p></div>
+    <div class="guide-step"><b>03 / 看看它有多特别</b><p>对一天内的全部时间评分并降序排列，沿用原作各分档位置的分数作为门槛。同分时属于同一稀有度。</p><div class="tiers" id="tierGuide"></div></div>
+    <p>探索记录和设置仅保存在当前浏览器中。徽章「20:26」保留原作的固定条件，不随年份变化。</p>
+  </div>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const fmt=n=>String(n).padStart(2,'0');
+const number=n=>n.toLocaleString('en-US');
+const gcd=(a,b)=>b?gcd(b,a%b):a;
+
+function prime(x){
+  if(x<=1)return false;
+  for(let i=2;i*i<=x;i++)if(x%i===0)return false;
+  return true;
+}
+const square=x=>Number.isInteger(Math.sqrt(x));
+
+// 条件和顺序均对应原作；整点与尾数零、末分钟之间保留 else-if 关系。
+const rules=[
+ ['up',11494,'步步高升','四位数字严格递增','↗',(h,m)=>Math.floor(h/10)<h%10&&h%10<Math.floor(m/10)&&Math.floor(m/10)<m%10],
+ ['xx:xx',333333,'四重奏','四位数字完全相同','✦',(h,m)=>Math.floor(h/10)===h%10&&h%10===Math.floor(m/10)&&Math.floor(m/10)===m%10],
+ ['xy:yx',62500,'镜像时刻','小时与分钟互为倒序','◇',(h,m)=>h===Math.floor(m/10)+m%10*10],
+ ['xy:xy',41666,'此刻成双','小时与分钟相同','〰',(h,m)=>h===m],
+ ['even',2777,'偶数默契','小时和分钟都是偶数','Ⅱ',(h,m)=>h%2===0&&m%2===0],
+ ['odd',2777,'奇数同频','小时和分钟都是奇数','Ⅰ',(h,m)=>h%2===1&&m%2===1],
+ ['x:2*x',41666,'双倍心动','分钟是小时的两倍','×',(h,m)=>m===h*2],
+ ['gcd>1',1742,'共同语言','小时与分钟的最大公约数大于一','∩',(h,m)=>gcd(h,m)>1],
+ ['prime',3067,'质数密语','小时和分钟均为质数，或 HHMM 为质数','⋆',(h,m,t)=>(prime(h)&&prime(m))||prime(t)],
+ ['sq:sq',25000,'方方正正','小时和分钟都是完全平方数，含零','□',(h,m)=>square(h)&&square(m)],
+ ['12:34',500000,'顺时而遇','12:34 或 00:34','✧',(h,m,t)=>t===1234||t===34],
+ ['09:01',500000,'九点零一','09:01 或 21:01','✧',(h,m,t)=>t===901||t===2101],
+ ['07:08',500000,'七点零八','07:08 或 19:08','✧',(h,m,t)=>t===708||t===1908],
+ ['02:38',500000,'两点三八','02:38 或 14:38','✧',(h,m,t)=>t===238||t===1438],
+ ['07:21',500000,'七点二一','07:21 或 19:21','✧',(h,m,t)=>t===721||t===1921],
+ ['11:45',500000,'十一点四五','11:45 或 23:45','✧',(h,m,t)=>t===1145||t===2345],
+ ['05:20',500000,'爱意时刻','05:20 或 17:20','♡',(h,m,t)=>t===520||t===1720],
+ ['13:14',500000,'一生一世','13:14 或 01:14','♡',(h,m,t)=>t===1314||t===114],
+ ['m-h=1',41666,'分秒相随','分钟比小时大一','+',(h,m)=>m-h===1],
+ ['h-m=1',43478,'时分相依','小时比分钟大一','−',(h,m)=>h-m===1],
+ ['20:26',1000000,'写给二〇二六','恰好是 20:26','✺',(h,m,t)=>t===2026],
+ ['00:00',1000000,'万象归零','恰好是 00:00','◎',(h,m,t)=>t===0],
+ ['xy:00',41666,'整点来信','除 00:00 之外的整点','○',(h,m,t)=>t!==0&&m===0],
+ ['xy:z0',6944,'逢十有喜','分钟个位为零，但不在整点','⌁',(h,m,t)=>t!==0&&m!==0&&t%10===0],
+ ['xy:z5',6944,'逢五的小确幸','分钟个位为五','⁕',(h,m,t)=>t%10===5],
+ ['23:59',1000000,'今日的最后一页','恰好是 23:59','☾',(h,m,t)=>t===2359],
+ ['xy:59',41666,'下一刻见','分钟是 59，但不在 23:59','›',(h,m,t)=>t!==2359&&m===59],
+ ['00:xy',16666,'零点的余温','零点之后，下一小时前','☾',(h,m)=>h===0&&m!==0],
+ ['13:xy',16666,'午后一时','小时是 13','☼',h=>h===13],
+ ['xy:13',41666,'十三分的秘密','分钟是 13','✢',(h,m)=>m===13],
+ ['xy:30',41666,'半点闲暇','分钟是 30','◐',(h,m)=>m===30],
+ ['a.m.',1388,'晨间序曲','中午十二点以前','☀',h=>h<12],
+ ['p.m.',1388,'午后漫游','中午十二点及以后','◒',h=>h>11]
+];
+
+function evaluate(h,m){
+  if(!Number.isInteger(h)||!Number.isInteger(m)||h<0||h>23||m<0||m>59)
+    throw new RangeError('时间不合法');
+  const badges=rules.filter(r=>r[5](h,m,h*100+m));
+  return {h,m,badges,score:badges.reduce((s,r)=>s+r[1],0)};
+}
+
+const all=Array.from({length:1440},(_,i)=>evaluate(Math.floor(i/60),i%60));
+const sorted=all.map(r=>r.score).sort((a,b)=>b-a);
+const tiers=[
+ {name:'MYTHIC',cn:'神话时刻',position:14,tone:'#92729e',tint:'#f3edf8'},
+ {name:'ANOMALY',cn:'非凡时刻',position:72,tone:'#b78d50',tint:'#faf2e3'},
+ {name:'EPIC',cn:'史诗时刻',position:144,tone:'#8b80ad',tint:'#f0eef8'},
+ {name:'RARE',cn:'稀有时刻',position:360,tone:'#6d96a1',tint:'#eaf3f5'},
+ {name:'UNCOMMON',cn:'小众时刻',position:720,tone:'#799260',tint:'#eff4e8'},
+ {name:'COMMON',cn:'日常时刻',position:null,tone:'#909889',tint:'#f0f2ed'}
+];
+const tierFor=score=>tiers.find(t=>t.position===null||score>=sorted[t.position-1]);
+
+function parseTime(h,m){
+  if(!/^\d{1,2}$/.test(h)||!/^\d{1,2}$/.test(m)||+h>23||+m>59)return null;
+  return {h:+h,m:+m};
+}
+function readStore(key,fallback){
+  try{return JSON.parse(localStorage.getItem(key))??fallback;}
+  catch{return fallback;}
+}
+function saveStore(key,value){
+  try{localStorage.setItem(key,JSON.stringify(value));}
+  catch{/* 隐私模式下仍可正常游戏。 */}
+}
+
+let history=readStore('timedle-history-v1',[]);
+history=Array.isArray(history)
+  ?history.filter(x=>x&&Number.isInteger(x.h)&&Number.isInteger(x.m)&&x.h>=0&&x.h<24&&x.m>=0&&x.m<60).slice(0,8)
+  :[];
+
+const prefs=readStore('timedle-settings-v1',{});
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+$('instant').checked=reduced||prefs?.instant===true;
+$('colorful').checked=prefs?.colorful!==false;
+let revealToken=0,toastTimer;
+
+function applyPrefs(){
+  document.body.classList.toggle('neutral',!$('colorful').checked);
+  saveStore('timedle-settings-v1',{
+    instant:$('instant').checked,
+    colorful:$('colorful').checked
+  });
+}
+$('instant').addEventListener('change',applyPrefs);
+$('colorful').addEventListener('change',applyPrefs);
+applyPrefs();
+
+function badgeNode(rule){
+  const node=document.createElement('div');
+  node.className='badge'+(rule[1]>=333333?' special':'');
+  node.title=rule[3];
+  node.innerHTML='<span class="badge-icon"></span><div class="badge-copy"><div class="badge-name"></div><div class="badge-code"></div></div><span class="badge-points"></span>';
+  node.querySelector('.badge-icon').textContent=rule[4];
+  node.querySelector('.badge-name').textContent=rule[2];
+  node.querySelector('.badge-code').textContent=rule[0];
+  node.querySelector('.badge-points').textContent='+'+number(rule[1]);
+  return node;
+}
+function announce(message){
+  $('announcement').textContent=message;
+}
+
+function finish(result){
+  const tier=tierFor(result.score);
+  $('score').textContent=number(result.score);
+  $('scoreLabel').textContent='时刻得分';
+  $('tierName').textContent=tier.name;
+  $('tierChinese').textContent=tier.cn;
+  $('rarity').style.setProperty('--tone',tier.tone);
+  $('rarity').style.setProperty('--tint',tier.tint);
+
+  const lower=sorted.filter(x=>x<result.score).length;
+  const rank=1+sorted.filter(x=>x>result.score).length;
+  const percent=(lower/1440*100).toFixed(1);
+  $('rankText').textContent='超越 '+percent+'% 的时刻';
+  $('rankPosition').textContent='当日第 '+rank+' 名'
+    +(sorted.filter(x=>x===result.score).length>1?' · 含并列':'');
+  $('rankFill').style.width=percent+'%';
+  $('resultHint').textContent='所有相遇的巧合，都会为这一刻加分。';
+  document.querySelector('.result-card').setAttribute('aria-busy','false');
+  announce(fmt(result.h)+':'+fmt(result.m)+'，'+tier.cn+'，得分 '
+    +result.score+'，获得 '+result.badges.length+' 枚徽章。');
+}
+
+async function discover(h,m,{instant=false,record=true}={}){
+  const token=++revealToken,result=evaluate(h,m);
+  $('hours').value=fmt(h);
+  $('minutes').value=fmt(m);
+  $('timeError').textContent='';
+  $('hours').removeAttribute('aria-invalid');
+  $('minutes').removeAttribute('aria-invalid');
+  $('resultTime').textContent=fmt(h)+':'+fmt(m);
+  $('badgeList').replaceChildren();
+  $('badgeList').scrollTop=0;
+  $('badgeCount').textContent=result.badges.length+' 枚巧合';
+  document.querySelector('.result-card').setAttribute('aria-busy','true');
+  $('scoreLabel').textContent='正在收集巧合';
+  $('score').textContent='0';
+  $('tierName').textContent='DISCOVER';
+  $('tierChinese').textContent='正在揭晓';
+  $('rarity').style.setProperty('--tone','#799260');
+  $('rarity').style.setProperty('--tint','#eff4e8');
+  $('rankText').textContent='每个巧合，都值得停留';
+  $('rankPosition').textContent='';
+  $('rankFill').style.width='0%';
+  $('resultHint').textContent='正在逐一揭晓时刻徽章…';
+
+  let total=0;
+  for(const rule of result.badges){
+    if(token!==revealToken)return;
+    $('badgeList').append(badgeNode(rule));
+    total+=rule[1];
+    $('score').textContent=number(total);
+    if(!instant&&!$('instant').checked&&!reduced){
+      await new Promise(resolve=>setTimeout(resolve,500));
+    }
+  }
+
+  if(token!==revealToken)return;
+  finish(result);
+  if(record){
+    history=[{h,m},...history.filter(x=>x.h!==h||x.m!==m)].slice(0,8);
+    saveStore('timedle-history-v1',history);
+    renderHistory();
+  }
+}
+
+function renderHistory(){
+  const list=$('historyList');
+  list.replaceChildren();
+
+  if(!history.length){
+    const empty=document.createElement('div');
+    empty.className='empty';
+    empty.textContent='还没有收藏的时刻。下一次发现，从现在开始。';
+    list.append(empty);
+    return;
+  }
+
+  for(const item of history){
+    const result=evaluate(item.h,item.m);
+    const tier=tierFor(result.score);
+    const button=document.createElement('button');
+    button.className='history-item';
+    button.style.setProperty('--tone',tier.tone);
+    button.style.setProperty('--tint',tier.tint);
+    button.setAttribute('aria-label',
+      '查看 '+fmt(item.h)+':'+fmt(item.m)+'，'+tier.cn);
+    button.innerHTML='<div><strong>'+fmt(item.h)+':'+fmt(item.m)
+      +'</strong><small>'+number(result.score)
+      +' 分</small></div><span class="history-rarity">'+tier.name+'</span>';
+    button.addEventListener('click',()=>
+      discover(item.h,item.m,{instant:true}));
+    list.append(button);
+  }
+}
+
+$('timeForm').addEventListener('submit',event=>{
+  event.preventDefault();
+  const parsed=parseTime($('hours').value,$('minutes').value);
+  if(!parsed){
+    $('timeError').textContent='请输入有效时间：小时 00–23，分钟 00–59。';
+    $('hours').setAttribute('aria-invalid','true');
+    $('minutes').setAttribute('aria-invalid','true');
+    return;
+  }
+  discover(parsed.h,parsed.m);
+});
+
+for(const id of ['hours','minutes']){
+  $(id).addEventListener('focus',()=>$(id).select());
+  $(id).addEventListener('input',()=>{
+    $('timeError').textContent='';
+    $(id).removeAttribute('aria-invalid');
+  });
+  $(id).addEventListener('keydown',event=>{
+    if(event.key==='ArrowUp'||event.key==='ArrowDown'){
+      event.preventDefault();
+      const max=id==='hours'?24:60,current=Number($(id).value);
+      $(id).value=fmt(
+        ((Number.isFinite(current)?current:0)
+        +(event.key==='ArrowUp'?1:-1)+max)%max
+      );
+    }
+  });
+}
+
+function randomMinute(){
+  const values=new Uint32Array(1);
+  const limit=Math.floor(4294967296/1440)*1440;
+  do{crypto.getRandomValues(values);}while(values[0]>=limit);
+  return values[0]%1440;
+}
+$('randomButton').addEventListener('click',()=>{
+  const i=randomMinute();
+  discover(Math.floor(i/60),i%60);
+});
+$('nowButton').addEventListener('click',()=>{
+  const now=new Date();
+  discover(now.getHours(),now.getMinutes());
+});
+$('exploreNav').addEventListener('click',()=>{
+  $('hours').focus();
+});
+
+function showToast(message){
+  clearTimeout(toastTimer);
+  $('toast').textContent=message;
+  $('toast').classList.add('show');
+  toastTimer=setTimeout(()=>$('toast').classList.remove('show'),2000);
+}
+$('clearHistory').addEventListener('click',()=>{
+  history=[];
+  saveStore('timedle-history-v1',history);
+  renderHistory();
+  showToast('探索记录已清空');
+});
+
+for(const [button,dialog] of [
+  ['atlasOpen','atlasDialog'],
+  ['helpOpen','helpDialog']
+]){
+  $(button).addEventListener('click',()=>$(dialog).showModal());
+}
+document.querySelectorAll('[data-close]').forEach(button=>
+  button.addEventListener('click',()=>button.closest('dialog').close())
+);
+document.querySelectorAll('dialog').forEach(dialog=>
+  dialog.addEventListener('click',event=>{
+    if(event.target===dialog){
+      const box=dialog.getBoundingClientRect();
+      if(event.clientX<box.left||event.clientX>box.right
+        ||event.clientY<box.top||event.clientY>box.bottom)dialog.close();
+    }
+  })
+);
+
+for(const rule of rules){
+  const item=document.createElement('div');
+  item.className='atlas-item';
+  const title=document.createElement('strong');
+  const points=document.createElement('span');
+  const description=document.createElement('p');
+  title.textContent=rule[4]+' '+rule[2];
+  points.textContent='+'+number(rule[1]);
+  description.textContent=rule[3];
+  item.append(points,title,description);
+  $('atlasList').append(item);
+}
+
+for(const tier of tiers){
+  const node=document.createElement('div');
+  node.className='tier-info';
+  node.style.setProperty('--tone',tier.tone);
+  node.style.setProperty('--tint',tier.tint);
+  node.innerHTML='<b>'+tier.name+'</b><span>'+tier.cn+' · '
+    +(tier.position?'≥ '+number(sorted[tier.position-1])+' 分':'其余时刻')
+    +'</span>';
+  $('tierGuide').append(node);
+}
+
+function tick(){
+  const now=new Date();
+  $('deviceTime').textContent='当地 '
+    +fmt(now.getHours())+':'+fmt(now.getMinutes());
+}
+tick();
+setInterval(tick,1000);
+renderHistory();
+discover(12,34,{instant:true,record:false});
+</script>
+</body>
+</html>
